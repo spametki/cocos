@@ -1,188 +1,198 @@
-Map Colliders
-=============
+Colisiones por Mapas
+====================
 
-Overview
---------
+Resumen
+-------
 
-If a scene has an actor moving, we may update its position from frame to frame
-using the discrete approximation::
+Si una escena tiene un actor en movimiento, podríamos actualizar su posición
+entre cuadros utilizando una aproximación discreta::
 
     velocity = velocity + acceleration * dt
     position = position + velocity * dt
 
-That's fine when the actor does not find an obstacle, like a wall.
+Eso es correcto siempre y cuando el actor no encuentra un obstáculo, como una
+pared.
 
-If there is an obstacle, we usually want to
- - stop the position change so the actor touches the obstacle but does
-   not overlap it.
- - do something sensible with the velocity (stop ?, bounce ?).
- - maybe do some action based on which obstacle (spikes ?, glass ?).
+Si hay un obstáculo, probablemente querramos
 
-To do this we can represent the actor and the obstacles as rects with sides
-parallel to the axis, and do the calculations.
+ - Detener el cambio de posición para que el actor toque el obstáculo pero
+   no se superponga con el.
+ - Realizar alguna acción importante con respecto a la velocidad (detener ?,
+   rebotar ?) 
+ - Quizás realizar alguna acción según cuál obstáculo se ha tocado (pinches ?,
+   vidrio ?).
 
-This is what `map colliders` do given:
- - the actor velocity, rect before and tentative rect after
- - a `map layer` that contains a number of obstacles
+Para hacer esto podemos representar al actor y a los obstáculos como
+rectángulos con lados paralelos los ejes, y hacer los cálculos.
 
-it will
-    - Properly update the velocity and the position.
-    - Call appropriate methods when it detects the actor bumped into an 
-      obstacle.
-    - Tell if any collision in the x and / or y axis happened.
+Eso es lo que hacen los `map colliders` según:
+ - La velocidad del actor, el el rectángulo previo y el rectángulo hipotético
+   que le sigue.
+ - un `map layer` que contiene una serie de obstáculos
 
-While some `mapcolliders` are meant to be used in tiled maps (
-:class:`~.mapcolliders.RectMapCollider`, :class:`.RectMapWithPropsCollider`),
-others (:class:`.TmxObjectMapCollider`) can be used with no tiles at all.
+hará lo siguiente
+    - Actualizar correctamente la velocidad y la posición.
+    - Invocar los métodos apropiados cuando detecte que el actor se ha topado
+      con un obstáculo.
+    - Determinar si alguna colisión en los ejes x o y ha ocurrido.
+
+Si bien algunos `mapcolliders` están pensados para ser usados en mapas de
+mosaicos (:class:`~.mapcolliders.RectMapCollider`,
+:class:`.RectMapWithPropsCollider`), otros (:class:`.TmxObjectMapCollider`)
+se pueden usar totalmente sin mosaicos.
 
 
-Properly update the velocity and the position
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Actualización correcta de la velocidad y la posición
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The position and the velocity update can be written as::
+La actualización de la posición y la velocidad se pueden escribir como::
 
     vx, vy = actor.velocity
 
-    # using the player controls, gravity and other acceleration influences
-    # update the velocity
+    # usando los controles del jugador, la gravedad y otros factores de
+    # aceleración, actualizar la velocidad
     vx = (keyboard[key.RIGHT] - keyboard[key.LEFT]) * actor.MOVE_SPEED
     vy += GRAVITY * dt
     if actor.on_ground and keyboard[key.SPACE]:
         vy = actor.JUMP_SPEED
 
-    # with the updated velocity calculate the (tentative) displacement
+    # con la velocidad actualizada calcular el desplazamiento hipotético
     dx = vx * dt
     dy = vy * dt
 
-    # get the player's current bounding rectangle
+    # obtener el rectángulo actual con los límites del jugador
     last = actor.get_rect()
 
-    # build the tentative displaced rect
+    # crear el rectángulo hipotético siguiente
     new = last.copy()
     new.x += dx
     new.y += dy
 
-    # account for hitting obstacles, it will adjust new and vx, vy
+    # detectar los obstáculos alcanzados, esto ajustará los nuevos vx, vy
     actor.velocity = mapcollider.collide_map(maplayer, last, new, vx, vy)
 
-    # update on_ground status
+    # actualizar el estado de on_ground
     actor.on_ground = (new.y == last.y)
 
-    # update player position; player position is anchored at the center of the image rect
+    # actualizar la posición del jugador; la posición del jugador se ancla al
+    # centro del rectángulo de la imagen
     actor.position = new.center
 
-How velocity changes in a collision is handled by method 
-:attr:`~.mapcolliders.RectMapCollider.on_bump_handler()`; it can be set to 
-custom code or to one of the stock handlers:
+El cambio de la velocidad en una colisión es manejado por el método
+:attr:`~.mapcolliders.RectMapCollider.on_bump_handler()`; este puede
+establecerse con código personalizado o con uno de los manejadores
+incorporados:
 
-    - :meth:`~.mapcolliders.RectMapCollider.on_bump_bounce()`: Bounces when 
-      a wall is touched.
-    - :meth:`~.mapcolliders.RectMapCollider.on_bump_stick()`: Stops all 
-      movement when any wall is touched. (sticky bomb...).
-    - :meth:`~.mapcolliders.RectMapCollider.on_bump_slide()`: Blocks movement 
-      only in the axis that touched a wall. (player...).
+    - :meth:`~.mapcolliders.RectMapCollider.on_bump_bounce()`: Rebota cuando
+      se toca una pared.
+    - :meth:`~.mapcolliders.RectMapCollider.on_bump_stick()`: Detiene todo
+      movimiento cuando se toca una pared. (sticky bomb ...).
+    - :meth:`~.mapcolliders.RectMapCollider.on_bump_slide()`: Bloquea todo
+      movimiento solo en el eje que tocó la pared. (jugador...).
 
-For convenience, a stock handler can be specified at instantiation time with
-the ``velocity_on_bump`` parameter.
+Por comodidad, se puede especificar un manejador incorporado en el momento de
+crear la instancia con el parámetro ``velocity_on_bump``.
 
 
-Call appropriate methods when it detects actor bumped into an obstacle
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Invocar métodos adecuados si se detecta que el actor se topó con un obstáculo
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-When ``mapcollider.collide_map`` detects that actor collides with obj 
-'someobj' from side 'someside', it will call 
+Cuando ``mapcollider.collide_map`` detecta que un actor colisiona el objeto
+'someobj' por el lado 'someside', llamará a 
 ``mapcollider.collide_<someside>(someobj)``.
 
-There 'someside' is one of 'left', 'right', 'top' and 'bottom'.
+Donde 'someside' es una opción entre 'left', 'right', 'top' y 'bottom'.
 
-This provides an opportunity to do things based on which object the actor 
-touched, like 'spike' ? -> init the spikes animation and kill the actor.
+Esto da la oportunidad de hacer cosas según qué objeto tocó el actor, como por
+ejemplo 'pinche' ? -> comenzar la animación de pinchar y matar al actor.
 
-Note that each ``mapcollider.collide_*`` can receive multiple calls in the 
-same ``mapcollider.collide_map`` call.
-
-
-Tell if any collision in the x and / or y axis happened
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-After ``collide_map`` returns, the flags ``mapcollider.bumped_x`` and 
-``mapcollider.bumped_y`` tells if there has been any collisions along the 
-respective axis.
-
-This can be handy to flip the actor's animation direction, by example from
-'walk_left' to 'walk_right'.
+Ten en cuenta que cada ``mapcollider.collide_*`` puede recibir múltiples
+llamadas en la misma llamada a ``mapcollider.collide_map``.
 
 
-Variants
+Determinar si ha ocurrido una colisión en los ejes x o y
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Una vez que ``collide_map`` finaliza, los indicadores ``mapcollider.bumped_x``
+y ``mapcollider.bumped_y`` informan si ha habido alguna colisión a lo largo de
+los ejes respectivos.
+
+Esto puede ser útil para invertir la dirección de la animación del actor, por
+ejemplo desde 'caminar_izquierda' a 'caminar_derecha'.
+
+
+Variantes
 ---------
 
-Currently they are three map colliders variants:
+Actualmente hay tres formas de colisiones por mapas:
 
 RectMapCollider
 ^^^^^^^^^^^^^^^
 
-Obstacles are rectangular tiles grouped into a :class:`.RectMapLayer`; all non
-empty cells are deemed solid.
+Los obstáculos son mosaicos rectangulares agrupados en :class:`.RectMapLayer`;
+todas las celdas no vacías se consideran sólidas.
 
-:class:`implementation <cocos.mapcolliders.RectMapCollider>`
+:class:`implementación <cocos.mapcolliders.RectMapCollider>`
 
 RectMapWithPropsCollider
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Obstacles are rectangular tiles grouped into a :class:`.RectMapLayer`, cells 
-use properties "left", "right", "top" and "bottom" to signal which side(s) 
-block movements.
+Los obstáculos son mosaicos rectangulares agrupados en :class:`.RectMapLayer`,
+las celdas usan las propiedades "left", "right", "top" y "bottom" para señalar
+qué lado(s) bloquea(n) el movimiento.
 
-A solid block would probably have all four sides set; a platform can set
-only the top so the player might jump up from underneath and pass through.
+Un bloque sólido probablemente tenga los cuatro lados habilitados; una
+plataforma puede habilitar solo "top" para que el jugador pueda saltar desde
+abajo y atravesarla.
 
-For convenience these properties would typically be set on the tiles
-themselves, rather than on individual cells. Of course for the cell which
-is the entrance to a secret area you could override a wall's properties to
-set the side to False and allow ingress.
+Es conveniente que estas propiedades se configuren en los mismos mosaicos, en
+lugar de hacerlo en celdas individuales. Por supuesto que en el caso de una
+celda que es una entrada a un área secreta podrías sobreescribir las
+propiedades de la pared para deshabilitar un lado y permitir el acceso.
 
-See :ref:`cell_properties_label` for information about properties.
+Ver :ref:`cell_properties_label` para detalles sobre propiedades.
 
-:class:`implementation <cocos.mapcolliders.RectMapWithPropsCollider>`
+:class:`implementación <cocos.mapcolliders.RectMapWithPropsCollider>`
 
 
 TmxObjectMapCollider
 ^^^^^^^^^^^^^^^^^^^^
 
-Obstacles are :class:`.TmxObjects` grouped into a :class:`.TmxObjectLayer`, 
-each object is meant to block movement.
+Los obstáculos son :class:`.TmxObjects` agrupados en un
+:class:`.TmxObjectLayer`, cada objeto tiene como propiedad bloquear el
+movimiento.
 
-A common use case is to do moving platforms in a platform game.
+Un uso típico es cuando se mueven plataformas en un juego de plataformas.
 
-:class:`implementation <cocos.mapcolliders.TmxObjectMapCollider>`
+:class:`implementación <cocos.mapcolliders.TmxObjectMapCollider>`
 
 
-How to use
------------------------
+Modo de uso
+-----------
 
-There are basically two ways to include this functionality into an
-actor class:
+Existen básicamente dos modos de incluir esta funcionalidad en una clase actor:
 
-    - as a component, essentially passing (mapcollider, maplayer) in
-      the actor's __init__ method.
-    - mixin style, by using :class:`~.mapcolliders.RectMapCollider` or a 
-      subclass as a secondary base class for the actor.
+    - como componente, básicamente pasando ((mapcollider, maplayer) en
+      el método __init__ del actor.
+    - estilo "mixin", usando :class:`~.mapcolliders.RectMapCollider` o una
+      subclase como clase base secundaria para el actor.
 
-The component way is more decoupled while the Mixin style is more powerful 
-because the collision code will have access to the entire actor through its 
-``self`` attribute.
+El modo como componente es más ordenado mientras que el estilo "mixin" es más
+potente ya que el código para las colisiones tendrá acceso a todo el actor a través
+del atributo ``self``.
 
-To have a working instance, the behavior of the velocity in a collision must 
-be defined, and that's the job of the method ``on_bump_handler``
+Para tener una instancia funcional, el comportamiento de la velocidad en una
+colisión debe estar definido, y ese es el trabajo del método
+``on_bump_handler``
 
-    - if one of the stock ``on_bump_<variant>`` suits the requirements, 
-      suffices to write::
+    - si alguno de los ``on_bump_<variante>`` cumple con los requerimientos,
+      basta con escribir::
       
-        mapcollider.on_bump_handler = mapcollider.on_bump_<desired variant>
+        mapcollider.on_bump_handler = mapcollider.on_bump_<variante elegida>
 
-      or passing a selector at instantiation time::
+      o pasando un selector en el momento de creación de la instancia::
       
-        mapcollider = MapCollider(<desired variant>)
+        mapcollider = MapCollider(<variante elegida>)
 
-    - for custom behavior define ``on_bump_handler`` in a subclass and 
-      instantiate it.
+    - para un comportamiento personalizado define ``on_bump_handler`` en una
+      subclase y crea una instancia de ella.

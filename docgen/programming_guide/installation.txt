@@ -1,93 +1,96 @@
-Installation, Dependencies and Compatibility 
+Instalación, Dependencias y Compatibilidad
 ============================================
 
 .. contents::
     :local:
 
-Dependencies
+Dependencias
 ^^^^^^^^^^^^
 
-most of functionality
-______________________
+
+para la mayor parte de las funciones
+____________________________________
 
     + six https://pypi.python.org/pypi/six/
     + pyglet https://bitbucket.org/pyglet/pyglet
 
-particles support
-_________________
+soporte de partículas
+_____________________
 
     + numpy www.numpy.org
 
-audio and video support by AVbin
-________________________________
+soporte para sonido y video de AVbin
+____________________________________
 
     + AVbin http://avbin.github.io/AVbin/Home/Home.html
     
-audio support by SDL
-____________________
+soporte para sonido de SDL
+__________________________
 
-    + in Windows, pygame http://www.pygame.org
-    + in unix-like OSes libraries sdl 1.2 and sdl-mixer 1.2; in debian/ubuntu their packages are libsdl1.2 and libsdl-mixer1.2
-    + in Mac, theres no confirmed info. Should be similar to unix.
+    + en Windows, pygame http://www.pygame.org
+    + en sistemas basados en unix librerías sdl 1.2 y sdl-mixer 1.2; para debian/ubuntu los paquetes son libsdl1.2 y libsdl-mixer1.2
+    + en Mac, no hay información confirmada. Debería ser similar a unix.
 
 
-What explicit dependencies are declared in the setup.py ?
+¿Cuáles son las dependencias explícitas declaradas en el setup.py?
 six and pyglet
 
 
-Compatibility
-^^^^^^^^^^^^^
+Compatibilidad
+^^^^^^^^^^^^^^
 
-Compatibility notes at the time of writing, August 2017
+Notas de compatibilidad al momento de esta edición, Agosto de 2017
 
-    + python : cocos needs python 2.6, 2.7 or 3.3+
-      The cocos codebase has direct support for 2.x and 3.x, so no need to run 2to3  
+    + python : cocos requiere python 2.6, 2.7 o 3.3+
+      El código base de cocos provee soporte directo para 2.x y 3.x, no es necesario ejecutar 2to3
 
-    + pyglet : pyglet 1.2 or better (1.3+ recomended)      
+    + pyglet : pyglet 1.2 o superior (se recomienda 1.3+)
 
-Installing
-^^^^^^^^^^
+Instalación
+^^^^^^^^^^^
 
-Have a modern setuptools or pip installed.
+Teniendo un setuptools moderno o pip instalado.
 
-While::
+Si bien::
 
     easy_install cocos2d
 
-or::
+o::
 
     pip install cocos2d
 
-should work, you will miss the docs and code samples. Its is therefore recommended to
+debería funcionar, te perderías la documentación y los ejemplos de código. Por lo tanto, es recomendable
 
-    + install six and pyglet
-    + download cocos2d-0.6.5.zip from https://pypi.python.org/pypi/cocos2d/
-    + decompress to a convenient location, the top dir will be cocos2d-0.6.5
-    + the html docs will be in cocos2d-0.6.5/doc/html
-    + useful code samples will be in cocos2d-0.6.5/test, cocos2d-0.6.5/samples, cocos2d-0.6.5/utest
-    + install by::
+    + instalar six y pyglet
+    + descargar cocos2d-0.6.5.zip de https://pypi.python.org/pypi/cocos2d/
+    + descomprimir en una ubicación conveniente, la carpeta superior será cocos2d-0.6.5
+    + la documentación en html estará en cocos2d-0.6.5/doc/html
+    + los prácticos ejemplos de código estarán en cocos2d-0.6.5/test, cocos2d-0.6.5/samples, cocos2d-0.6.5/utest
+    + instalar con::
 
         cd cocos2d-0.6.5
         setup.py install
 
-      or alternatively by pointing that directory from a .pth or PYTHONPATH
-    + All of cocos should be usable now, with the possible exceptions
+      o en su defecto apuntando a ese directorio en un .pth o PYTHONPATH
+    + Todo el contenido de cocos debería estar disponible ahora, con estas posibles excepciones
 
-        - cocos particles
-        - SDL audio backend
-        - AVBin (pyglet) audio-video backend 
+        - partículas en cocos
+        - soporte para sonido SDL
+        - soporte para sonido y video AVBin (pyglet)
 
-If you want to add these, look at the dependencies section.
+Si las quieres agregar, consulta la sección de dependencias.
 
-Using PYTHONPATH or .pth
-^^^^^^^^^^^^^^^^^^^^^^^^
 
-It is safe to point a checkout of cocos from a .pth or PYTHONPATH both
-in python 2.x and 3.x; the same checkout can be pointed at the same time from both pythons.
+Utilizando PYTHONPATH o .pth
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The same is valid for pyglet vs 1.3+ (but note that at pyglet 1.3.0rc1 you will need to also 
-install the pakage 'future')
+Es seguro apuntar a un checkout de cocos desde un .pth o PYTHONPATH tanto
+en python 2.x como en 3.x; el mismo checkout se puede especificar al mismo tiempo para los dos python.
 
-Pyglet with version < 1.3 does python 3 compatibility by running 2to3 at install time, so while
-a pyglet checkout can be pointed from a .pth or PYTHONPATH in python 2.x,
-that will not work for python 3.
+Lo mismo vale para pyglet vs 1.3+ (pero ten en cuenta que para pyglet 1.3.0rc1 también deberás
+instalar el paquete 'future')
+
+Pyglet en versiones < 1.3 provee compatibilidad con python 3 ejecutando 2to3 durante la instalación, así que mientras
+se puede apuntar a un checkout de pyglet desde un .pth o PYTHONPATH en python 2.x,
+eso no funcionaría en python 3.
+

@@ -1,38 +1,40 @@
-﻿Collision
-=========
+Colisiones﻿
+===========
 
 .. contents::
     :local:
 
-Collision Model
----------------
+Modelo de colisiones
+--------------------
 
-Use cases
-^^^^^^^^^
+Usos posibles
+^^^^^^^^^^^^^
 
-It is common to ask about one or another spatial relation between actors, by example
+Es típico consultar sobre una u otra relación espacial entre actores, por ejemplo
 
-	- any enemy is touching player ?
-	- is player near to certain enemy or trigger ?
-	- which enemy is nearest the player ?
-	- any actor under the mouse cursor ?
+	- ¿algún enemigo está tocando a un jugador?
+	- ¿algún jugador está cerca de un enemigo o a algo que genere una acción?
+	- ¿cuál enemigo está más cerca del jugador?
+	- ¿algún actor está bajo el puntero del mouse?
 
-The collision_model module has functionality to address these questions, lets see how it works.
+El módulo collision_model tiene los elementos necesarios para responder estas preguntas,
+veamos cómo funciona. 
 
-Simplified shapes
-^^^^^^^^^^^^^^^^^
+Siluetas simplificadas
+^^^^^^^^^^^^^^^^^^^^^^
 
-Actors generally have an irregular shape, thus to answer 'actor A is touching actor B ?' ideally the rendered pixels for both actors should be considered. That would be too slow, so each actor specifies a simple geometrical shape to be used for collision calculations, and the question is translated to 'shape for actor A overlaps shape for actor B ?'
+Los actores por lo común tienen una silueta irregular, entonces para responder '¿A está tocando a B?' se debería chequear cada pixel de los dos actores. Eso sería demasiado lento, así que cada actor especifica una figura geométrica simple a usarse para la detección de colisiones,
+y la pregunta se transforma en '¿la silueta del actor A se superpone con la del actor B?'
 
-The available shapes at the moment are circles (discs) and rectangles with sides parallel to the axis x=0 and y=0.
+Las formas disponibles hasta el momento son los círculos (disc) y rectángulos con lados paralelos a los ejes x=0 e y=0.
 
-What an object must comply to be collidable ?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+¿Qué debe cumplir un objeto para ser colisionable?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-	- must have a member .cshape
-	- the .cshape value is an instance of :class:`~cocos.collision_model.CircleShape` or :class:`~cocos.collision_model.AARectShape`
+	- debe tener un elemento .cshape
+	- el valor del elemento .cshape es instancia de :class:`~cocos.collision_model.CircleShape` o de :class:`~cocos.collision_model.AARectShape`
  
-Examples::
+Ejemplos::
 
 	import cocos.euclid as eu
 	import cocos.collision_model as cm
@@ -47,72 +49,74 @@ Examples::
 		def __init__(self, cx, cy, radius):
 			self.cshape = cm.CircleShape(eu.Vector2(center_x, center_y), radius)
 			
-The role of collision manager
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+El rol del administrador de colisiones
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Questions like 'which actors are near actor A ?' implicitly assumes a set of candidates to try is known. Thats when a CollisionManager instance kicks in: it holds a record of which collidables consider as candidates for proximity or collision. Being the entity that knows the candidates, it is the one to answer questions about spatial relations between a collidable and the known collidables.
+Las preguntas como '¿Qué actores están cerca de A?' asumen en forma implícita que un conjunto de candidatos a probar se ha definido previamente. Aquí es donde aparece la instancia de CollisionManager: ella almacena un registro de qué objetos colisionables están
+próximos y pueden colisionar. Al ser el objeto que conoce los candidatos, es el que se encargará de responder preguntas acerca
+de relaciones espaciales entre un colisionable y sus colisionables próximos.  
 
-To mantain the set of know candidates you have the methods
+Para administrar el conjunto de candidatos conocidos están los siguientes métodos
 
-	- add(obj) : makes obj a collidable known to the CollisionManager instance 
-	- remove_tricky(obj) : makes the collisionManager instance forget about obj; to perform correctly obj.cshape must have the same value as when .add(obj) was called 
-	- clear() : the CollisionManager instance will forget all known objects
+    - add(obj) : hace que obj sea un colisionable reconocido por la instancia de CollisionManager
+    - remove_tricky(obj) : hace que la instancia de CollisionManager olvide a obj; para que funcione obj.cshape debe ser igual que al llamar .add(obj) 
+    - clear() : la instancia de CollisionManager olvidará todos los objetos conocidos
 	
-For testing and debug purposes the methods ´knows(obj)´ and ´known_objs()´ are available.
+Para pruebas y depuración están disponibles los métodos ´knows(obj)´ y ´known_objs()´.
 
-Correct answers requires that the known objects have the same cshape value at the asking time than at the 'add' time.
-To satisfy that restriction there are two common strategies
+Una respuesta correcta depende de si los objetos conocidos tienen el mismo valor cshape al consultar y al agregarse.
+Para satisfacer esta restricción hay dos estrategias típicas.
 
-	- do collision_manager.remove_tricky(obj); obj.update_cshape(); collision_manager.add(obj) whenever obj need to update his cshape value. This is relatively slow, but acceptable if few collidables need to update his cshape at each frame.
+    - hacer collision_manager.remove_tricky(obj); obj.update_cshape(); collision_manager.add(obj) cada vez que obj requiere actualizar su valor de cshape. Esto es relativamente lento, pero aceptable si son pocos los colisionables que necesitan actualizar su cshape en cada cuadro.
 
-	- at each frame do::
-	
-		collision_manager.clear()
-		update cshape for all collidables
-		add all collidables to collision_manager
-		do the game logic related to actor collision
-		
-	This pattern is adequate when most of actors change cshape at each frame.
+    - en cada cuadro hacer::
 
-Sometimes it can be worth to use two collision manager instances: one for actors that rarely change it's cshape (rocks, food,...) and other entities that update cshape at each frame (player, monsters,...) 
+        collision_manager.clear()
+        actualizar el cshape para todo colisionable
+        agregar todos los colisionables al collision_manager 
+        utilizar la misma lógica para la colisión de actores
 
-Limitations and weaknesees
+
+      Este patrón es adecuado cuando la mayor parte de los actores cambian el cshape en cada cuadro.
+
+A veces puede valer la pena el uso de dos instancias del administrador de coliciones: una para actores que rara vez cambian el cshape (rocas, comida, ...) y otra para objetos que actualizan su cshape en cada cuadro (jugadores, monstruos, ...)
+
+
+Limitaciones y debilidades
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This is probably the simplest schema to deal with collisions and proximity.
-The code and API are simple and easy to modify.
-The drawbacks are well known
+Este es posiblemente el esquema más sencillo para lidiar con colisiones y proximidad.
+El código y la API son simples y fáciles de modificar.
+Las desventajas son bien conocidas.
 
-	- collisions for too fast or too tiny objects can go undetected 
-	- ill suited to do realistic bounces  
+    - las colisiones para muy pequeños o muy rápidos objetos pueden pasarse por alto
+    - no es adecuado para rebotes realistas
 
-More details
+Más detalles
 ^^^^^^^^^^^^
 
-Look at :class:`~cocos.collision_model.CollisionManager` and :class:`~cocos.collision_model.Cshape` for details; for __init__parameters look at the respective implementation.
+Ver :class:`~cocos.collision_model.CollisionManager` y :class:`~cocos.collision_model.Cshape` para más detalles; Para los parámetros de __init__ ver la implementación correspondiente.
 
-Performance numbers
--------------------
+Datos de rendimiento
+--------------------
 
-The benchmark
-^^^^^^^^^^^^^
+La prueba de rendimiento
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-The benchmark moves a number of balls in a rectangular area, with soft bounce in the ball-ball and ball-border interactions. We measure the time to calculate a fixed number of frames without drawing; this gives the time per physic frame.
-The initial positions are randomly chosen in the rectangle, and the initial velocity has random uniform angle.
-Most of the time the balls will have a uniform distribution over the rectangle.  
+La prueba de rendimiento mueve cierta cantidad de bolas en un área rectangular, con rebote suave en las interacciones bola-bola y bola-borde. Se mide el tiempo para calcular una cantidad preestablecida de cuadros sin generar los gráficos; esto da el tiempo en función de los cálculos físicos por cuadro. Las posiciones iniciales se eligen en forma aleatoria en el rectángulo, y la velocidad inicial tiene ángulo aleatorio uniforme. Lo más probable es que las bolas tengan una distribución uniforme en el rectángulo.
 
-The model for the world is coded in  benchmarks/collision/a0_bouncing_balls_Model.py, and the runner in benchmarks/collision/a0_benchmark_time_per_frame.py
+El código fuente del modelo de entorno se ha colocado en benchmarks/collision/a0_bouncing_balls_Model.py, y el motor en benchmarks/collision/a0_benchmark_time_per_frame.py
 
-Directly running the model script renders on screen and shows the fps.  
+Al ejecutar directamente el script del modelo se muestra en pantalla con el detalle de cuadros por segundo.
 
 Testbed: windows xp sp3 32 bits, python 2.6.5,
 AMD athlon dual core 5200+, memory DDR2 800 single channel
 
-Comparing with brute force
+Comparando con fuera bruta
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A benchmark was writen to compare brute force versus other implementations.
-Currently the only CollisionManager implementation is CollisionManagerGrid, which has parameters defining the cell size; the figure compares time per frame for brute force and CollisionManagerGrid with diferent cell sizes.
+Se ha creado una prueba de rendimiento para comparar el método de fuerza bruta con otras implementaciones
+Actualmente la única implementación de CollisionManager es CollisionManagerGrid, que acepta parámetros para definir el tamaño de celdas; la figura compara la duración por cuadro para fuerza bruta y CollisionManagerGrid con distintos tamaños de celdas.
 
 .. image:: comparing_collision_managers.png
    :align: center
@@ -120,17 +124,17 @@ Currently the only CollisionManager implementation is CollisionManagerGrid, whic
    :height: 600px
    
 
-Shape comparisson
-^^^^^^^^^^^^^^^^^
+Comparación por silueta
+^^^^^^^^^^^^^^^^^^^^^^^
 
-The benchmark is parametrizable in the Cshape implementation to use; here we compare circle vs AABB
+La prueba de rendimiento se puede personalizar con parámetros según la implementación de Cshape que se utilice; aquí se comparan círculos vs AABB
 
 .. image:: comparing_shapes.png
    :align: center
    :width: 500px
    :height: 600px
 
-Ballpark fps
-^^^^^^^^^^^^
+Cuadros por segundo en Ballpark
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The visualization provided by a0_bouncing_balls_Model.py, which shows all balls and a colored rectangle runs at 60 fps with 165 balls, and 30fps with 300 balls (gpu ati radeon 4650) 
+La visualización provista con a0_bouncing_balls_Model.py, que muestra todas las bolas y un rectángulo coloreado corre a 60 fps con 165 bolas, y 30fps con 300 bolas (gpu ati radeon 4650)

@@ -1,18 +1,18 @@
-Built-in Python Interpreter
-===========================
+El Intérprete de Python Embebido
+================================
 
-A python interpreter can be activated by pressing
-the keys CTRL + i in Windows and Linux and by
-using COMMAND + i in OS/X.
+Se puede activar un intérprete de python presionando
+las teclas CTRL + i en Windows y Linux y con
+COMMAND + i en OS/X.
 
-The ``locals()`` of the python interpreter are:
+Los ``locals()`` del intérprete de python son:
 
     - ``cocos``
     - ``director``
     - ``self``
 
-The interpreter also has some attributes that 
-can be changed in runtime, like:
+Además el intérprete tiene algunas propiedades
+que se pueden cambiar en ejecución, por ejemplo:
 
     - ``opacity``
     - ``color``
@@ -20,27 +20,28 @@ can be changed in runtime, like:
     - ``cfg['code.font_name']``
     - ``cfg['code.font_color']``
 
-For example::
+Por ejemplo::
 
-    # 0 means, no opacity
-    # 255 means,  full opacity
+    # 0 significa sin opacidad
+    # 255 significa totalmente opaco
     self.opacity = 50
 
-    # changing layer color to a reddish one
+    # modificando el color de la sección a uno rojizo
     self.color = (204, 32, 32 )
 
-    # changing the font color to white
+    # cambiando el color de la fuente a blanco
     self.cfg['code.font_color'] = (255,255,255)
 
-    # changing the font size
+    # cambiando el tamaño de la fuente
     self.cfg['code.font_size'] = 24
 
-    # changing the font name
+    # cambiando el nombre de la fuente
     self.cfg['code.font_name'] = 'Courier New'
 
-    # obtaining the current scene:
+    # obteniendo la escena actual:
     current_scene = director.scene
 
-Once the interpreter was activated, it will remain in memory.
-From now on, you can hide it and show it by pressing
-(again) the CTRL+i (or COMMAND+i) keys.
+Una vez que se activa el intérprete, este permanecerá en memoria.
+De aquí en más, puedes ocultarlo o mostrarlo presionando las teclas
+(de nuevo) CTRL+i (o COMMAND+i).
+

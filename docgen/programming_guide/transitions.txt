@@ -1,76 +1,76 @@
-Scenes & Transitions
-====================
+Escenas y Transiciones
+======================
 
 .. contents::
     :local:
 
-Using Director's API
---------------------
+Utilizando la  API del Director
+-------------------------------
 
-As we mentioned earlier, one of the main responsibilities of
-the `Director` is to manage the control flow of the scenes.
+Como se mencionó antes, una de las tareas principales de
+el `Director` es la de manejar la secuencia de las escenas.
 
-To do this, the director provides an API::
+Para ello, el director tiene una API::
 
-    director.replace(new_scene)
+    director.replace(nueva_escena)
 
-    director.push(new_scene)
+    director.push(nueva_escena)
     director.pop()
 
-Use :meth:`.Director.replace` to replace the current scene with a new one,
-and use :meth:`.Director.push` to push a new scene on the stack. 
-The old scene will be stacked under the new one.
-You can remove a scene from the stack using :meth:`.Director.pop`.
+Usa :meth:`.Director.replace` para reemplazar la escena actual por una nueva,
+y usa :meth:`.Director.push` para agregar una escena nueva a la pila.
+La escena anterior será apilada debajo de la nueva.
+Puedes quitar una escena de la pila utilizando :meth:`.Director.pop`.
 
-When a new scene is pushed or replaced, these actions will be executed::
+Cuando se agrega o reemplaza una escena, se ejecutan las siguientes acciones::
 
-    # calls on_exit on the 'old' scene
-    outgoing_scene.on_exit()
+    # llama a on_exit en la escena anterior
+    escena_saliente.on_exit()
 
-    # disable handlers
-    outgoing_scene.enable_handlers(False)
-
-
-    # calls on_enter() on the 'new' scene
-    incoming_scene.on_enter()
-
-    # enable handlers
-    incoming_scene.enable_handlers(True)
+    # deshabilitar los handler
+    escena_saliente.enable_handlers(False)
 
 
-When a :class:`.Scene` is *entered*, it will propagate the *on_enter* message
-to all its children, and its children will do the same with their children,
-and so on.
+    # llama a on_enter() en la 'nueva' escena
+    escena_entrante.on_enter()
 
-The same happens with the *on_exit* message.
+    # habilita los handler
+    escena_entrante.enable_handlers(True)
 
 
-Transitions
------------
+Cuando una :class:`.Scene` se *ingresa*, hará que se propague el mensaje
+*on_enter* a todos los hijos, y los hijos harán lo mismo con los suyos, y así
+sucesivamente.
 
-A nicer way to change between scenes, is to *decorate* the new scene with
-a *Transition* *Scene*.
+Lo mimso ocurre con el mensaje *on_exit*.
 
-**Technically**, a transition scene is a scene that performs a transition effect before
-setting control to the new scene.
 
-And **visually**, a transition scene is like the transitions you see using any
-presentation software like OpenOffice Impress, Apple's KeyNote or PowerPoint.
+Transiciones
+------------
+
+Una forma más agradable de cambiar entre escenas, es la de *decorar* la
+nueva escena con una escena *Escena* de *Transición*.
+
+**Técnicamente**, una transición es una escena que realiza un efecto de transición antes
+de pasar el control a la nueva escena.
+
+Y **visualmente**, una escena de transición es como las transiciones que se
+ven en software de presentaciones como OpenOffice Impress, Apple KeyNote o PowerPoint.
 
 .. image:: transition.png
 
-Example::
+Ejemplo::
 
-    # import all the transitions
+    # importar todas las transiciones
     from cocos.scenes import *
 
-    # using director replace
-    # using the Fade-Top-Right Transition that lasts 2 seconds
-    director.replace(FadeTRTransition(gameover_scene, duration=2))
+    # usar el método replace de Director
+    # usar una transición Fade-Top-Right que dure dos segundos
+    director.replace(FadeTRTransition(escena_juegoterminado, duration=2))
 
 
-    # or, using 'push' with the Flip-X transition that lasts 1 second.
+    # o, usando 'push' con una transición Flip-X que dure un segundo.
     director.push(FlipX3DTransition(gameover_scene, duration=1))
 
-List of available transitions:
+Lista de las transiciones disponibles:
     - :mod:`.transitions`

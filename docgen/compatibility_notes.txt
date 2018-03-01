@@ -1,39 +1,43 @@
-Api changes and other compatibility notes
+Cambios en la api y otras notas de compatibilidad
+
 
 cocos 0.6.5
 -----------
 
-	- First cocos version to support pyglet 1.3 , tested against pyglet 1.3.rc1
-	- This cocos version can also run with pyglet 1.2.x
-	- Next cocos version will drop support for python 2.6
-	- Python 2.7 support can end at any future cocos release, without further advice: if pyglet drops it or a cocos new feature requires more than trivial compatibility code, then cocos will be py3 only
+    - La primera versión de cocos con soporte para pyglet 1.3, testeada con pyglet 1.3.rc1
+	- Esta versión de cocos también se puede ejecutar con pyglet 1.2.x
+	- La próxima versión de cocos ya no tendrá soporte para python 2.6
+	- El soporte para Python 2.7 se puede terminar en cualquier versión futura de cocos sin aviso previo: si previamente pyglet lo elimina o si una funcionalidad nueva necesita más que una modificación trivial, entonces cocos será compatible solo con py3.
+
 
 cocos 0.6.4
 -----------
 
-Imports in cocos library are more specific, so user code that were doing
-``from cocos.somemodule import *`` may fail to find some symbols.
-To fix that user code, add explicit exports as needed.
+Los import en la librería cocos son más específicos, así que el código fuente
+que estaba haciendo ``from cocos.somemodule import *`` podría fallar con algunos
+símbolos.
+Para reparar esos casos, agregar exports explícitos según se requiera.
 
-MapColliders classes changed API to be more useful and clear. 
-    - :class:`~.mapcolliders.RectMapCollider` moved to his own module, 
+Las clases MapColliders cambiaron su API para ser más útiles y claras.
+    - :class:`~.mapcolliders.RectMapCollider` se movió a su propio módulo,
       :mod:`.mapcolliders`.
-    - :class:`~.mapcolliders.RectMapCollider` was renamed to 
+    - :class:`~.mapcolliders.RectMapCollider` se renombró como 
       :class:`.RectMapWithPropsCollider`.
-    - The new :class:`~.mapcolliders.RectMapCollider` handles a simpler 
-      collision case, when all tiles are solid: now no need to set cells 
-      properties to signal a cell border should not be walked over.
-    - :class:`.TmxObjectMapCollider` now handles AABB collision with any 
-      :class:`.TmxObject` that can be loaded.
+    - La nueva :class:`~.mapcolliders.RectMapCollider` controla un caso más
+      sencillo de colisión, cuando todos los cuadrados son sólidos: ahora no
+      es necesario establecer propiedades de celdas para que un borde no se
+      deba pasar por arriba.
+    - :class:`.TmxObjectMapCollider` ahora maneja colisiones AABB con cualquier
+      :class:`.TmxObject` que se pueda cargar.
 
-:meth:`.Rect.intersects()` now it only intersects if some interior points
-overlaps.
+:meth:`.Rect.intersects()` ahora solo se interseca si hay superposición de algún
+punto interior.
 
-Removed :class:`.Scene` methods ``push_all_handlers()`` and 
+Se eliminaron de :class:`.Scene` los métodos ``push_all_handlers()`` y 
 ``remove_all_handlers()``.
 
-In :class:`.ScrollingManager` two methods have been renamed, the old name is
-still valid but will be removed in the future:
+Se cambiaron los nombres de dos métodos en :class:`.ScrollingManager`, el nombre
+antiguo todavía está soportado pero se eliminará en el futuro:
 
   - ``pixel_from_screen()`` \-> ``screen_to_world()``
   - ``pixel_to_screen()`` \-> ``world_to_screen()``

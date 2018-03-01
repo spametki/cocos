@@ -1,38 +1,38 @@
-Skeletal Animations
-===================
+Animación con esqueletos
+========================
 
 .. contents::
     :local:
         
-The skeleton modules provides a way to have 2d skeletal animations in
-your cocos applications. The process of may be a bit complicated to setup, but
-using them afterwards is easy, and there are some tools to simplify the process.
+Los módulos skeleton proveen de una forma de tener animaciones 2d con esqueletos
+en tu aplicación de cocos. La manera de trabajar con ellos puede llegar a ser
+un poco complicada de configurar, pero luego su uso es muy sencillo, y hay
+algunas herramientas que hacen el proceso más simple.
 
-To do skeletal animations in cocos you will have to:
+Para hacer animación con esqueletos en cocos deberás:
 
-    - Create a skeleton
-    - Create one or many skins
-    - Create all the animations you want
+    - Crear un esqueleto
+    - Crear uno o más figuras (skin)
+    - Crear todas las animaciones que quieras
 
+
+Luego, para utilizarlas tendrás que:
+
+    - Cargar el esqueleto
+    - Cargar la figura
+    - Agregar un Skin, nodo de cocos a tu escena
+    - Cargar las animaciones
+    - Usar la acción Anim en el nodo Skin para reproducir las animaciones
     
-Then, to use them you will have to:
-
-    - Load the skeleton
-    - Load the skin
-    - Add a Skin cocos node to your scene
-    - Load the animations
-    - Use the Anim action on the skin node to play animations.
-
-    
-Creating Skeletons and skins
+Creando Esqueletos y Figuras
 ----------------------------
 
-The skeleton file
-^^^^^^^^^^^^^^^^^
+El archivo del esqueleto
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-Skeletons are defined in .py files. The first thing you will do is create the
-root bone for your skeleton. Here we create what is going to be the body of our
-human skeleton as follows:
+Los esqueletos se definen en archivos .py. Lo primero que debes hacer es crear
+el hueso principal de tu esqueleto. Aquí creamos lo que va a ser el cuerpo de
+tu esqueleto humano:
 
 doc/programming_guide/skeleton/root_bone.py::
 
@@ -41,19 +41,19 @@ doc/programming_guide/skeleton/root_bone.py::
     root_bone = Bone('body', 70, -180.0, (0.00, 0.00))
     
     skeleton = Skeleton(root_bone)
-    
-This reads like: Create a bone labeled 'body' that is 70 pixels long, is
-rotated by -180 degrees and starts on (0,0). We rotate the bone because we want
-to be able to move its shoulders and not its legs, so the fixed part of the
-skeleton will be its waist, ie, the origin of the root bone.
 
-You can see the skeleton you have created using with a small piece of code.
+Esto se lee de esta forma: Crear un hueso con etiqueta 'body' que tenga 70
+píxel de largo, que esté rotado -180 grados y que se ubique en (0,0). Rotamos
+el hueso porque queremos poder mover sus hombros y no sus piernas, para que la
+parte fija del esqueleto sea la cintura, o sea, el origen del hueso principal.
+
+Puedes ver el esqueleto que has creado usando una pequeña pieza de código.
 
 from doc/programming_guide/skeleton/show_root_bone.py::
 
     from cocos import skeleton
     
-    # import the skeleton we have created
+    # importar el esqueleto que hemos creado
     import root_bone
 
     class TestLayer(cocos.layer.Layer):
@@ -62,28 +62,29 @@ from doc/programming_guide/skeleton/show_root_bone.py::
     
             x,y = director.get_window_size()
             
-            # create a ColorSkin for our skeleton
+            # crear una figura para nuestro esqueleto
             self.skin = skeleton.ColorSkin(root_bone.skeleton, (255,0,0,255))
             
-            # add the skin to the scene
+            # agregar la figura a la escena
             self.add( self.skin )
             x, y = director.get_window_size()
             self.skin.position = x/2, y/2
 
-It will look like this:
+Se verá así:
 
 .. figure:: show_root_bone.png
 
-The important new concept here is the skin. Skins are responsible for drawing
-the skeletons. Here we use the basic skin, ColorSkin, that just draws a colored
-line over the bone. A skin, like everything else, is just a cocosnode, so you
-can add it to your node to place it on screen.
+El nuevo concepto en juego aquí es la figura. Las figuras se encargan de
+dibujar los esqueletos. Aquí usamos una figura básica, ColorSkin, que solo
+dibuja una línea coloreada sobre el hueso. Una figura, como todo lo demás, no
+es otra cosa que un cocosnode, por lo que puedes agregarla a tu nodo para
+ubicarlo en la pantalla.
 
-The skin file
-^^^^^^^^^^^^^
+El archivo de la figura
+^^^^^^^^^^^^^^^^^^^^^^^
 
-Now, we want to skin this skeleton with some images, so we create a skin file.
-The skin file will look like this:
+Ahora, queremos darle una figura a este esqueleto con imágenes, así que creamos
+un archivo de figura. El archivo de la figura se verá así:
 
 doc/programming_guide/skeleton/root_skin.py::
 
@@ -91,17 +92,17 @@ doc/programming_guide/skeleton/root_skin.py::
         ('body', (25, 91), 'gil-cuerpo.png', True, True, 0.5),
       ]
       
-This reads like: This skin ha an image for the bone labeled 'body', this image
-has an offset of (25, 91) from the bone origin, the image file is
-'gil-cuerpo.png' (provided by cocos), its flipped on its x axis, its flipped on
-its y axis (remember we rotated the bone by -180), and its scaled to half its
-size.
+Esto se lee: Esta figura tiene una imagen para el hueso con la etiqueta 'body',
+y la imagen tiene una ubicación relativa de (25, 91) desde el origen del hueso,
+el archivo de la imagen es 'gil-cuerpo.png' (viene con cocos), invertir la
+imagen en el eje x, también en el eje y (recuerda que la hemos rotado en -180),
+y cambiar el tamaño a la mitad.
 
-Now we can show the skeleton with the skin we have just created.
+Ahora podemos mostrar el esqueleto con la figura que acabamos de crear.
 
 from doc/programming_guide/skeleton/show_root_skin.py::
 
-    # import the skeleton we have created
+    # importar el esqueleto que hemos creado
     import root_bone
     import root_skin
     
@@ -111,51 +112,51 @@ from doc/programming_guide/skeleton/show_root_skin.py::
     
             x,y = director.get_window_size()
             
-            # create a ColorSkin for our skeleton
+            # crear una figura ColorSkin para nuestro esqueleto
             self.skin = skeleton.BitmapSkin(root_bone.skeleton, root_skin.skin)
             
-            # add the skin to the scene
+            # agregar la figura a la escena
             self.add( self.skin )
             x, y = director.get_window_size()
             self.skin.position = x/2, y/2
        
-It will look like this:
+Esto se verá así:
 
 .. figure:: show_root_skin.png
 
-The skeleton editor
-^^^^^^^^^^^^^^^^^^^
+El editor de esqueletos
+^^^^^^^^^^^^^^^^^^^^^^^
 
-At this point, we can use the first tool provided, the skeleton editor. You start
-the editor like this::
+En este punto, podemos usar la primera herramienta con la que contamos, el
+editor de esqueletos. Para iniciar el editor ejecutar el siguiente comando::
     
     tools$ python skeleton/skeleton_editor.py ../doc/programming_guide/skeleton/root_bone.py ../doc/programming_guide/skeleton/root_skin.py
     
-It will look like this:
+Esto se verá así:
 
 .. figure:: root_editor.png
 
-There you can see the skin part of your skeleton and several control points.
-Control points can be dragged. If a control point is on top of another control
-point, you can change your selection using the scroll weel. The current control
-point has a small halo.
+Ahí puede verse la parte de la figura de tu esqueleto y muchos otros puntos
+de control. Los puntos de control se pueden arrastrar. Si un punto de control
+está sobre otro punto de control, puedes cambiar tu selección usando la ruedita
+del mouse. El punto de control seleccionado está levemente resaltado.
 
-In this example you can see the red control point, which controls the rotation
-of the bone, the two blue control points, which control the position of the
-bone and skin part, and the green control point (behind one of the blue ones)
-which controls the skeleton position.
+En este ejemplo se puede ver el punto de control rojo, que controla la rotación
+del hueso, los dos puntos de control azules, que controlan la posición de del
+hueso y la parte de la figura, y el punto de control verde (detrás de uno de
+los azules) que controla la posición del esqueleto.
 
-Pressing 's' will save the changes you have made to the skeleton and skin file. This
-will overwrite the .py files, so b carefull to just pur the data of the skeleton
-and skin in this files.
+Al presionar 's' se guardarán los cambios que hayas hecho al esqueleto y al
+archivo de la figura. Esto hara que se sobreescriban los archivos .py, por lo
+tanto ten cuidado de poner solo datos de esqueleto y figura en estos archivos.
 
-This is a helpfull tool in creating your skins, as the only way to know the real
-offsets between your skeleton parts and the image the artist has creates is
-visually.
+Esta es una herramienta útil para crear tus figuras, ya que la única forma de
+saber las verdaderas posiciones relativas entre las partes de tu esqueleto y
+la imagen que ha creado el artista es visualmente.
 
-Now we add more bones and skin parts to the skeleton. Bones, other than the root
-bone, are attached to other bones and thei position and rotation are relative to
-its parent bone position and rotation.
+Ahora agregamos más huesos y partes de la figura al esqueleto. Los huesos, a
+excepción del hueso principal, están ligados a otros huesos y sus posiciones
+y rotaciones son relativas a las del hueso padre.
 
 doc/programming_guide/skeleton/body_and_arm.py::
 
@@ -171,22 +172,22 @@ doc/programming_guide/skeleton/body_and_arm.py::
     
     skeleton = Skeleton(root_bone)
 
-Here we abuse the fact that the function 'add' returns the parent bone, so
-you can chain call to add and have and indentation that resembles the
-hierarchical structure of the skeleton.
+Aquí aprovechamos que la función 'add' devuelve el hueso padre, para que de
+esta manera puedas hacer llamadas sucesivas a add y tengas un espaciado que
+asemeje la esctructura jerárquica del esqueleto.
 
-The upper arm is 30 pixels long and is placed at the end of the body by offsetting
-if -70 pixels. The lower
-arm is also 30 pixels long and is also placed at the end of its parent, the upper
-arm. Bone length doesnt affect the transofrmations or placement of other bones,
-but it useful to see what you are creating.
+La parte superior del brazo tiene 30 píxel de largo y se ubica al final del
+cuerpo, declarando una posición relativa de -70 píxel. El antebrazo también
+mide 30 píxel y también está ubicado al final de su padre, la parte superior
+del brazo. El largo del hueso no afecta las transformaciones o la ubicación
+de otros huesos, pero es útil echar un vistazo a lo que se está haciendo.
 
-The skeleton we have just created looks like this:
+El esqueleto que acabamos de crear se ve así:
 
 .. figure:: body_and_arm.png
 
-Now we add the skin. We wont care about the positions or flipping, as we will
-be changing that parameters when looking at it.
+Ahora agregamos la figura. No nos importan las posiciones o la orientación, ya
+que cambiaremos esos parámetros cuando los veamos.
 
 doc/programming_guide/skeleton/body_and_arm_skin.py::
 
@@ -196,81 +197,83 @@ doc/programming_guide/skeleton/body_and_arm_skin.py::
         ('upper_arm', (0, 0), 'gil-brazo1.png', False, False, 0.5),
       ]
 
-The mess we have just created will look like this:
+El lío que acabamos de hacer se verá de esta forma:
 
 .. figure:: body_and_arm_skin_pre.png
 
-We now have to use the editor to drag the parts until it looks like this:
+Ahora tenemos que usar el editor para arrastrar las partes hasta que quede
+de esta manera:
 
 .. figure:: body_and_arm_skin_final.png
 
-NOTE: When moving the control points, things look weird. Its because you are actually
-only aplying a translation to the point. But the translation is then aplied over
-the transformed point. It looks crazy, but you can get used to it if you play
-with it for a while. And if you dont, you can just submit a patch.
+CUIDADO: Cuando se mueven los puntos de control, las cosas no se ven bien. Esto
+es porque solo estás aplicando una traslación al punto. Pero luego la
+traslación se aplica al punto transformado. Parece extraño, pero uno se
+acostumbra luego de usar la herramienta por un tiempo. Y en caso de que no te
+acostumbres, puedes enviarnos un parche.
 
-It is important to move the bones, not just the skin, so the shoulder and elbow
-move at the right locations. You can test that rotating the bones and making
-sure that the images look good in all positions.
+Es importante que se muevan los huesos, no solo las figuras, de forma que el
+hombro y el codo se muevan al lugar adecuado. Puedes probar esto rotando los
+huesos y asegurandote de que las imágenes se vean bien en todas las posiciones.
 
-You then press the 's' key to save.
+Y al finalizar presiona la tecla 's' para guardar.
 
-You should continue this way until you have the full skeleton and skin defined.
+Deberías seguir de ese modo hasta que tengas el esqueleto y la figura totalmente
+definidos.
 
-You can see and use the sample skeleton and skin provided in the test directory::
+Puedes ver y usar el esqueleto de ejemplo y la figura que vienen en el directorio test::
 
     tools$ python view_skeleton.py ../test/sample_skeleton.py
     
     tools/skeleton$ python skeleton_editor.py ../../test/sample_skeleton.py ../../test/sample_skin.py
     
-Animations
-----------
+Animaciones
+-----------
+
+Ahora que tienes tus esqueletos, es tiempo de animarlos. Una animación tiene una
+lista de cuadros principales (keyframe), es decir, lo que indica las distintas poses
+y su tiempo. Cuando reproduces una animación, cocos modificará el esqueleto según
+el tiempo transcurrido, interpolando entre el cuadro anterior y el siguiente.
 
 
-Now that you have your skeletons, its time to animate them. An animation has a
-list of keyframes, ie, skeleton poses and times. When you play an animation,
-cocos will pose your skeleton according to the current time, interpolating between
-the previous and next frame.
+El editor de animaciones
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-
-The animator editor
-^^^^^^^^^^^^^^^^^^^
-
-Start the animation editor doing::
+Activa el editor de animaciónes con el siguiente comando::
 
     tools/skeleton$ python animator.py ../../test/sample_skeleton.py --skin ../../test/sample_skin.py ../../test/SAMPLE.anim 
 
 .. figure:: animator.png
 
-On the top you can see the timeline with the keyframes in blue and the
-current position marked in yellow.
+En la parte superior se puede ver la línea de tiempo con los cuadros principales
+en azul y la posición actual resaltada con amarillo.
 
-You can also see the first keyframe, with its skin and control points.
+Además se puede ver el primer cuadro principal, con su figura y puntos de control.
 
-You can control the animator with the following keys:
+Puedes controlar el editor con las siguientes teclas:
 
- - *S*: Save the current animator
- - *LEFT*: move $TICK_DELTA time to the left
- - *RIGHT*: move $TICK_DELTA time to the right
- - *PLUS*: add a keyframe in the current position
- - *MINUS*: remove the keyframe in the current position
- - *PAGE UP*: Move to the previous keyframe
- - *PAGE DOWN*: Move to the next keyframe
- - *INSERT*: insert $TICK_DELTA time at the current position
- - *DELETE*: delete $TICK_DELTA time at the current position
- - *HOME*: Go to the start of the animation
- - *END*: Go to the end of the animation
- - *SPACE*: Play the animation
- 
-When standing on a keyframe you will see some control points, that you can move to edit the
-keyframe.
+ - *S*: Guardar el estado actual del editor
+ - *IZQUIERDA*: Correr el tiempo $TICK_DELTA a la izquierda
+ - *DERECHA*: Correr el tiempo $TICK_DELTA a la derecha
+ - *MÁS*: Agregar un cuadro principal a la posición actual
+ - *MENOS*: Eliminar el cuadro principal en la posición actual
+ - *AV PÁG*: Ir al cuadro principal anterior
+ - *RE PÁG*: Ir al cuadro principal siguiente
+ - *INSERT*: Insertar el tiempo $TICK_DELTA en la posición actual
+ - *SUPR*: Eliminar el tiempo $TICK_DELTA en la posición actual
+ - *INICIO*: Ir al comienzo de la animación
+ - *FIN*: Ir al final de la animación
+ - *ESPACIO*: Reproducir la animación
 
-$TICK_DELTA is 1/16 of a second.
+Cuando se está sobre un cuadro principal se puden ver algunos puntos de control
+que pueden moverse para modificarlo.
 
-Playing animations
-^^^^^^^^^^^^^^^^^^
+$TICK_DELTA es 1/16 de segundo.
 
-You can play an animation on a skin doing:
+Reproduciendo animaciones
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Puedes reproducir una animación de una figura haciendo:
 
 from test/test_skeleton_anim.py::
 
@@ -286,11 +289,11 @@ from test/test_skeleton_anim.py::
             anim = cPickle.load(open("SAMPLE.anim"))
             self.skin.do( cocos.actions.Repeat( skeleton.Animate(anim) ) )
             
-The Animate action has the following parameters: recenter, recenter_x, recenter_y.
-This control how the skeleton position is moved. If you run two walk left animations without translation
-you will see a player move left, go to the origin and move left again. if you use
-translation, the player will just move left twicenas far.
+La acción Animate tiene los siguientes parámetros: recenter, recenter_x, recenter_y.
+Esto controla la forma en que la posición del esqueleto se mueve. Si corres dos animaciones
+de caminar hacia la izquierda sin la opción de traslación verás al jugador moverse hacia la izquierda,
+ir al origen e ir hacia la izquierda de nuevo. Si usas la opción de traslación, el jugador solo irá hacia
+la izquierda y se desplazará el doble de distancia.ç
 
-Also, animations can be flipped, which makes the character look to the other side.
-
+Además, las animaciones se pueden invertir, haciendo que el personaje se oriente hacia el lado opuesto.
 

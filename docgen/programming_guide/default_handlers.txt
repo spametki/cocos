@@ -1,35 +1,36 @@
-Default Handlers
-================
+Handlers por Defecto
+====================
 
-cocos2d provides default handlers for some actions.
+cocos2d viene con handlers por defecto para algunas acciones.
 
-In Windows and Linux, the shortcuts are
-CTRL + key, but in Mac, the shortcut is
-COMMAND + key.
+En Windows y Linux, los atajos son
+CTRL + tecla, pero en Mac, el atajo es
+COMMAND + tecla.
 
  - CTRL + f
 
-    Toggles fullscreen mode
+    Cambia a pantalla completa
 
  - CTRL + s
 
-    Takes a screenshot of the current window.
+    Hace una captura de pantalla de la ventana actual.
 
-    A file named 'screenshot-xxxxx' will be saved in the current
-    working directory.
+    Se guardará un archivo con nombre 'screenshot-xxxxx' en el
+    directorio actual de ejecución.
 
  - CTRL + p
 
-    Toggles Pause
+    Pausa / Continuar
 
  - CTRL + w
 
-    Toggles wire-frame mode
+    Activa / Desactiva el modo wire-frame
 
  - CTRL + x
 
-    Toggles FPS display
+    Activa / Desactiva la información de cuadros por segundo
 
  - CTRL + i
 
-    Toggles the built-in python interpreter
+    Activa / Desactiva el intérprete de python embebido
+

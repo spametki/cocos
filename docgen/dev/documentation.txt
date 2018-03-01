@@ -1,109 +1,112 @@
-===================
-Documentation Notes
-===================
+=========================
+Notas de la Documentación
+=========================
 
-Making the switch to sphinx
-===========================
+Cambiando a sphinx
+==================
 
-Documentation was rendered with epydoc and some custom extensions until cocos 0.5.5. Epydoc is long time unmaintained, and needs patches to work with newer python and docutils versions, so a change to a well maintained doc library was needed.
+La documentación se generaba con epydoc y algunas extensiones especiales hasta cocos 0.5.5. Epydoc ya no tiene mantenimiento, y precisa
+parches para funcionar con nuevas versiones de python y docutils, así que hacía falta el cambio hacia una librería actualizada.
 
-Sphinx is the current de facto standard, so documentation will use sphinx.
+Sphinx es el nuevo estándar de facto, así que la documentación usará sphinx.
 
-Guidelines for sphinx customization
-===================================
+Lineamientos para personalizar sphinx
+=====================================
 
-Keep customization at a minimun to avoid the need of maintenace when sphinx changes.
+Mantén la personalización al mínimo para evitar la necesidad de mantenimiento cuando se modifica shinx.
 
-Hints for some common markup operations in docstrings
-=====================================================
+Ayuda para algunas operaciones usuales en docstring
+===================================================
 
-Please use 4 spaces indentation.
+Por favor utiliza sangría de cuatro espacios.
 
-Tabs usually break things, convert them to spaces.
+La tabulación suele generar errores, conviértela a espacios.
 
-Inline literal text: \`\`my_literal_text\`\` -> ``my_literal_text``.
-(in link syntax ``~`` is a modidier that supress the high parts in a dotted name). 
+Texto literal inline: \`\`my_literal_text\`\` -> ``my_literal_text``.
+(en la sintaxis de link ``~`` es un modificador que suprime las partes superiores en un nombre punteado).
  
-Link to a cocos module: ``:mod:`~cocos.cocosnode` ->`` :mod:`~cocos.cocosnode`
+Link a un módulo de cocos: ``:mod:`~cocos.cocosnode` ->`` :mod:`~cocos.cocosnode`
 
-Link to a cocos module: ``:mod:`cocos.cocosnode` ->`` :mod:`cocos.cocosnode`
+Link a un módulo de cocos: ``:mod:`cocos.cocosnode` ->`` :mod:`cocos.cocosnode`
 
-Link to a class: ``:class:`~cocos.cocosnode.CocosNode` ->`` :class:`~cocos.cocosnode.CocosNode`
+Link a una clase: ``:class:`~cocos.cocosnode.CocosNode` ->`` :class:`~cocos.cocosnode.CocosNode`
 
-Link to a method: ``:meth:`~cocos.cocosnode.CocosNode.add` ->``  :meth:`~cocos.cocosnode.CocosNode.add`
+Link a un método: ``:meth:`~cocos.cocosnode.CocosNode.add` ->``  :meth:`~cocos.cocosnode.CocosNode.add`
 
-Link to a method:
+Link a un método:
 ``:meth:`CocosNode.add<cocos.cocosnode.CocosNode.add>` ->``  :meth:`CocosNode.add()<cocos.cocosnode.CocosNode.add>`
 
-Link to a function: ``:func:`cocos.tiles.load` ->`` :func:`cocos.tiles.load`
+Link a una función: ``:func:`cocos.tiles.load` ->`` :func:`cocos.tiles.load`
 
 .. Note::
-    If the class, method, attribute or function exists in the cocos project, 
-    prepending the name with a dot is normally sufficient. This works as well for
-    argument types
+    Si una clase, método, atributo o función existe en un proyecto de cocos,
+    normalmente alcanza con anteponer un punto al nombre. Esto también vale para
+    argumentos/parámetros.
 
-    * link to a class ``:class:`.CocosNode` ->`` :class:`.CocosNode`
+    * link a una clase ``:class:`.CocosNode` ->`` :class:`.CocosNode`
 
-There are other roles like:
+Hay otras construcciones como por ejemplo:
 
-* ``:data:`` -> Reference a module-level variable.
+* ``:data:`` -> Referencia a una variable de módulo.
 
-* ``:const:`` -> Reference a defined constant. This may be a Python variable that is not intended to be changed.
+* ``:const:`` -> Referencia a una constante. Esta puede ser una variable de Python que no deba modificarse.
 
-* ``:attr:`` -> Reference a data attribute of an object.
+* ``:attr:`` -> Referencia a un tipo de datos de un objeto.
 
-* ``:exc:``  -> Reference an exception. A dotted name may be used.
+* ``:exc:``  -> Referencia a una excepción. Se debería usar la notación de puntos.
 
-* ``:obj:``  -> Reference an object of unspecified type. Useful e.g. as the default_role.
+* ``:obj:``  -> Referencia a un objeto sin tipo definido. Es útil por ejemplo como default_role.
 
-Link to a section or some arbitrary point in any document:
+Link a una sección o a cualquier punto dentro del documento:
 
-	- declare a label at the target location with ``.. _labelname:`` (the '_' is not part of labelname)
-	- write the link as ``:ref:`TextToShowInLink<labelname>``` (brackets included)
-	- if TextToShowInLink is ommited the ref should be just before a section and the section title will be used as the text to show in the link
-	- labelname must be unique across all documents
-	
-Link to another document in the current sphinx build: 
-    - ``:doc:`TextToShowInLink<documentName>``` (brackets included)
-    - ``:doc:`documentName``` (will show the document title in the link)
+    - Declarar una etiqueta en la ubicación de destino con ``.. _nombredeetiqueta:`` (el '_' no pertenece a la etiqueta)
+    - Escribir el link como ``:ref:`TextoAMostrarEnElLink<nombredelaetiqueta>``` (incluyendo los corchetes)
+    - Si el TextoAMostrarEnElLink se omite la ref debería preceder a una sección y el título de la sección se usará como el texto a mostrar en el link
+    - nombredelaetiqueta debe ser la misma en todo el documento
 
-Functions and Methods docstring
-===============================
+Link a otro documento en el mismo build de sphinx:
+    - ``:doc:`TextoAMostrarEnElLink<nombreDelDocumento>``` (incluyendo los corchetes)
+    - ``:doc:`nombreDelDocumento``` (se mostrará el título del documento en el link)
 
-We use `Napoleon <http://www.sphinx-doc.org/en/stable/ext/napoleon.html>`_ extension from Sphinx. Docstrings are laid out using the `Google style <http://google.github.io/styleguide/pyguide.html#Comments>`_. 
-The docstring should contain a section for Arguments (if they are present in the signature) and for the Return type if different from ``None``.
+Docstring para Funciones y Métodos
+==================================
 
-Examples::
+Utilizamos la extensión `Napoleon <http://www.sphinx-doc.org/en/stable/ext/napoleon.html>`_ de sphinx. Se usa el diseño de página de <http://google.github.io/styleguide/pyguide.html#Comments>`_. 
+El docstring debería contener una sección para Argumentos (si los hubiera) y para el tipo de objeto devuelto si es otro que ``None``.
+
+
+Ejemplos::
 
     def add(self, child, z=0, name=None):
-        """Add the child and then update the manager's focus / viewport.
+        """Agregar el hijo y luego actualizar el foco del manager/viewport.
 
         Args:
-            child (CocosNode): The node to add. Normally it's a 
+            child (CocosNode): Nodo a agregar. Usualmente es un
                 :class:`ScrollableLayer`.
-            z (int) : z-order for this child.
-            name (str) : The name of this child. [Optional]
+            z (int) : índice z para este hijo.
+            name (str) : El nombre de este hijo. [Opcional]
         """
 
 ::
 
     def pixel_to_screen(self, x, y):
-        """Look up the screen-space pixel matching the Layer-space pixel.
+        """Busca el píxel de la pantalla que se corresponde con el píxel del Layer.
 
-        Account for viewport, layer and screen transformations.
+        Vale para transformaciones de viewport, layer y pantalla.
 
-        Arguments:
-            x (int): x coordinate in map space
-            y (int): y coordinate in map space
+        Argumentos:
+            x (int): coordenada x en el espacio del Layer
+            y (int): coordenada y en el espacio del Layer
 
-        Returns:
-            tuple[int, int]: coordinates in screen space
+        Devuelve:
+            tuple[int, int]: coordenadas en el espacio de la pantalla
         """
 
-Here are some guidelines when writing documentation
+Algunos lineamientos para la escritura de la documentación
 
-* The content should be precise enough so that anyone can understand what the class, method or function does.
-* No markup in docstring's first line. That line is presented raw by editors in autocomplete tooltips, so the markup looks weird.
-* Don't linkify class A or function f mentions in their own docstring(s). The reader is already in the class / function doc, so the link adds nothing except visual noise. It is fine to link to some specific subppart, like :method:...
-* Use triple double quotes to delimit docstrings.
-* When a subclass changes a bit some baseclass methods, and the baseclass method's docstring is large, it is better to signal only the differences with the baseclass method and to point to the base for extra explanations.
+* El contenido debería ser lo suficientemente preciso para que cualquiera pueda comprender qué hace una función, clase o método.
+* No usar el lenguaje de etiquetas en la primera línea del docstring. Esa línea se muestra idéntica en los mensajes de autocomplete, así que el etiquetado se ve extraño.
+* No linkear la clase A o la función f dentro de su mismo docstring. El lector ya está en el documento de la clase / función, y por lo tanto el link no agrega nada excepto ruido. Es correcto hacer links a una parte específica del documento, por ejemplo :method:...
+* Utilizar tres comillas dobles para encerrar los docstring.
+* Si una subclase hace pequeños cambios en métodos de la clase base, y los docstring de esos métodos son extensos, es preferible señalar únicamente los cambios y hacer una referencia a la clase base para mayor detalle.
+

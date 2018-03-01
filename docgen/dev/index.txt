@@ -1,8 +1,8 @@
-=========
-Dev Notes
-=========
+==========================
+Notas para Desarrolladores
+==========================
 
 .. toctree::
    :maxdepth: 1
 
-   documentation
+   Documentación <documentation>

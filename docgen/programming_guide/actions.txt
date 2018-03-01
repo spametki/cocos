@@ -1,55 +1,55 @@
-Actions, Transformations and Effects
+Acciones, Transformaciones y Efectos
 ====================================
 
 .. contents::
     :local:
     
-Actions
--------
+Acciones
+--------
 
-Actions are like orders given to any :class:`~cocos.cocosnode.CocosNode` object.
+Las acciones son como órdenes dadas a cualquier objeto :class:`~cocos.cocosnode.CocosNode` object.
 
-These actions usually modify some the object's attributes like `position`,
-`rotation`, `scale`, etc.
+Esas acciones usualmente modifican algún atributo del objeto como por ejemplo
+`position`, `rotation`, `scale`, etc.
 
-For example, the :class:`~cocos.actions.base_actions.MoveBy` action modifies the `position` attribute along a period of time
+Por ejemplo, la acción :class:`~cocos.actions.base_actions.MoveBy` modifica el atributo `position` durante cierto período de tiempo
 
-Example::
+Ejemplo::
 
-    # Move a sprite 50 pixels to the right, and 100 pixel to the top in 2 seconds.
+    # Mover el sprite 50 píxeles hacia la derecha, y 100 píxeles hacia arriba en 2 segundos.
     sprite.do( MoveBy( (50,100), duration=2 ) )
 
-The actions behavior related to time classifies them in three groups:
+El comportamiento de las acciones respecto del tiempo las diferencia en tres grupos:
 
-    :class:`InstantAction<cocos.actions.base_actions.InstantAction>` : the change is applied in one step
-    Example::
+    :class:`InstantAction<cocos.actions.base_actions.InstantAction>` : el cambio se aplica en un paso
+    Ejemplo::
     
-        # instantly move the sprite to the position (120, 330)
+        # mover instantáneamente el sprite a la posición (120, 330)
         sprite.do( Place( (120, 330) )) 
-    
-    :class:`IntervalAction<cocos.actions.base_actions.IntervalAction>` : the change is applied in many steps along a time duration that is known at the action instantiation. Example, the above mentioned MoveBy
 
-    :class:`Action<cocos.actions.base_actions.Action>` : the change is applied in many steps along the time, but the duration is not know at instantiation time or it is 'forever'
-    
-The IntervalAction actions have some interesting properties:
+    :class:`IntervalAction<cocos.actions.base_actions.IntervalAction>` : el cambio se aplica en varios pasos durante cierto tiempo que se conoce al crear la instancia de la acción. Como ejemplo, ver el comando mencionado arriba MoveBy
 
-    - The timeflow can be modified using the time-altered actions
+    :class:`Action<cocos.actions.base_actions.Action>` : el cambio se aplica en varios pasos durante cierto tiempo, pero la duración no se conoce al crear la instancia de la acción o es continua
+    
+Las acciones IntervalAction tienen algunas propiedades interesantes:
+
+    - El flujo del tiempo se puede modificar usando acciones para alterarlo
     
         + :class:`~cocos.actions.interval_actions.Accelerate`
         + :class:`~cocos.actions.interval_actions.AccelDeccel`
         + :class:`~cocos.actions.interval_actions.Speed`
 
-    - All the relative actions (the ones ending in 'By') and some
-      absolute actions (the ones ending in 'To')  have a `Reverse` action
-      that executes the action in the opposite direction.
+    - Todas las acciones relativas (las que terminan en 'By') y algunas
+      absolutas (las que terminan en 'To') tienen su acción `Reverse` que
+      ejecuta la acción en el sentido opuesto.
 
 
-Basic actions
--------------
+Acciones Básicas
+----------------
 
-Basic actions are the ones that modifies basic attributes like:
+Las acciones básicas son las que modifican atributos básicos como:
 
- - position
+ - posición
  
     - :class:`~cocos.actions.interval_actions.MoveBy`
     - :class:`~cocos.actions.interval_actions.MoveTo`
@@ -58,226 +58,225 @@ Basic actions are the ones that modifies basic attributes like:
     - :class:`~cocos.actions.interval_actions.Bezier`
     - :class:`~cocos.actions.instant_actions.Place`
 
- - scale
+ - tamaño
  
     - :class:`~cocos.actions.interval_actions.ScaleBy`
     - :class:`~cocos.actions.interval_actions.ScaleTo`
 
- - rotation
+ - rotación
  
     - :class:`~cocos.actions.interval_actions.RotateBy`
     - :class:`~cocos.actions.interval_actions.RotateTo`
 
- - visible
+ - visibilidad
  
     - :class:`~cocos.actions.instant_actions.Show`
     - :class:`~cocos.actions.instant_actions.Hide`
     - :class:`~cocos.actions.interval_actions.Blink`
     - :class:`~cocos.actions.instant_actions.ToggleVisibility`
 
- - opacity
+ - opacidad
  
     - :class:`~cocos.actions.interval_actions.FadeIn`
     - :class:`~cocos.actions.interval_actions.FadeOut`
     - :class:`~cocos.actions.interval_actions.FadeTo`
     
 
-Examples can be seen in ``test/test_<action name>.py`` , like ``test/test_moveby.py`` for MoveBy action  
+Se pueden ver ejemplos de MoveBy en ``test/test_<action name>.py`` , like ``test/test_moveby.py``
 
-Special Actions
----------------
+Acciones Especiales
+-------------------
 
-**time related:** do nothing along a duration
+**relativas al tiempo:** no realizar acciones durante un lapso
   - :class:`~cocos.actions.interval_actions.Delay`
   - :class:`~cocos.actions.interval_actions.RandomDelay`
 
-**flow control:**  call a specified function. Used usually in conjuction with the sequence operator to express the semantic 'after action_1 call this function' 
+**control de flujo:**  llamar a una determinada función. Se usa normalmente junto con el operador de secuencia que expresa la semántica 'al finalizar accion_1 llamar a esta función' 
   - :class:`~cocos.actions.instant_actions.CallFunc`
   - :class:`~cocos.actions.instant_actions.CallFuncS`
 
-**grid helpers:** helpers to do grid actions
+**ayudantes de grilla:** ayudantes para realizar acciones en una grilla
   - :class:`~cocos.actions.basegrid_actions.StopGrid`
   - :class:`~cocos.actions.basegrid_actions.ReuseGrid`
   
-**camera related**
+**relativos a la cámara**
   - :class:`~cocos.actions.camera_actions.OrbitCamera`
  
 
-Composition and modification of actions
----------------------------------------
+Composición y modificación de acciones
+--------------------------------------
 
-Cocos also provide some powerful operators to combine or modify actions, the
-more important being listed below. Runnable examples are named as ``test_<operator or modifier name>.py``
+Cocos también viene con algunos operadores poderosos que combinan o modifican
+acciones, entre los que se destacan los que se listan a continuación. Ver los
+ejemplos ejecutables del tipo ``test_<nombre del operador o modificador>.py``
 
-**sequence operator:**   action_1 + action_2 -> action_result
+**operador de secuencia:**   accion_1 + accion_2 -> accion_compuesta
 
-where action_result performs by first doing all that action_1 would do and
-then perform all that action_2 would do
+Donde accion_compuesta consiste en primero realizar todo lo que haría accion_1
+y luego realizar todo lo que haría accion_2
 
-Example use::
+Ejemplo de uso::
 
-    move_2 = MoveTo((100, 100), 10) + MoveTo((200, 200), 15)
+    mover_2 = MoveTo((100, 100), 10) + MoveTo((200, 200), 15)
 
-When activated, move_2 will move the target first to (100, 100), it will
-arrive there 10 seconds after departure; then it will move to (200, 200),
-and will arrive there 10 seconds after having arrived to (100, 100)
+Cuando se active, mover_2 moverá el objeto primero hacia (100, 100) y arribará
+a esa posición a los 10 segundos de partir; luego moverá el objeto hacia
+(200, 200), y arribará a la posición luego de otros 10 segundos
 
-**spawn operator:**  action_1 | action_2 -> action_result
+**operador spawn:**  accion_1 | accion_2 -> accion_compuesta
 
-where action_result performs by doing what would do action_1 in parallel with
-what would perform action_2
+Donde accion_compuesta consiste en hacer lo que haría accion_1 en paralelo con
+lo que haría accion_2
 
-Example use::
+Ejemplo de uso::
 
-    move_rotate = MoveTo((100,100), 10) | RotateBy(360, 5)
+    mover_rotando = MoveTo((100,100), 10) | RotateBy(360, 5)
 
-When activated, move_rotate will move the target from the position at the
-time of activation to (100, 100); also in the first 5 seconds target will
-be rotated 360 degrees
+Al activarse, mover_rotando moverá el objeto desde la posición al momento de
+activarse hasta (100, 100); además en los primeros 5 segundos el objeto se
+rotará 360 grados
 
-**loop operator:**   action_1 * n -> action_result
+**operador de bucle:**   accion_1 * n -> accion_compuesta
 
-Where n non negative integer, action_result would repeat n times in a
-row the same that action_1 would perform.
+Siendo n un entero no negativo; accion_compuesta repetirá n veces seguidas lo
+mismo que haría accion_1.
 
-Example use::
+Ejemplo de uso::
 
-    rotate_3 = RotateBy(360, 5) * 3
+    rotar_3 = RotateBy(360, 5) * 3
 
-When activated, rotate_3 will rotate target 3 times, spending 5 sec in each
-turn.
+Al activarse, rotar_3 rotará el objeto 3 veces, utilizando 5 segundos en cada
+rotación.
 
-**repeat forever:**  Repeat(action_1) -> action_result
+**bucle continuo:**  Repeat(accion_1) -> accion_compuesta
 
-where action_result plays action_1, then repeats action_1 each time that action_1 terminates 
+Donde accion_compuesta realiza accion_1 y luego repite accion_1 cada vez que accion_1 finaliza
 
-Example use::
+Ejemplo de uso::
 
-    rotate_forever = Repeat(RotateBy(360, 3))
+    rotar_siempre = Repeat(RotateBy(360, 3))
 
-When activated, the target will rotate forever, doing a revolution each 3 seconds
-  	
-**Time-flow modifiers**
+Al activarse, el objeto rotará continuamente, dando una vuelta completa cada 3 segundos
+
+**modificadores del flujo del tiempo**
     - :class:`~cocos.actions.interval_actions.Accelerate`
     - :class:`~cocos.actions.interval_actions.AccelDeccel`
     - :class:`~cocos.actions.interval_actions.Speed`
     - :class:`~cocos.actions.base_actions.Reverse`
 
-**Grid Amplitude modifiers**
+**modificadores de amplitud de grillas**
     - :class:`~cocos.actions.basegrid_actions.AccelAmplitude`
     - :class:`~cocos.actions.basegrid_actions.DeccelAmplitude`
     - :class:`~cocos.actions.basegrid_actions.AccelDeccelAmplitude`
     
 
-Effects
+Efectos
 -------
 
-Effects are a special kind of actions. Instead of modifying normal attributes
-like *opacity*, *color*, *position*, *rotation*, or *scale*, they modify a new kind
-of attribute: the **grid** attribute.
+Los efectos son tipos especiales de acción. En lugar de modificar atributos
+normales como *position*, *rotation*, *color*, o *scale*, modifican un nuevo
+tipo de atributo: el atributo **grid** (grilla).
 
-A grid attribute is like a matrix, it is a network of lines that cross each other
-to form a series of squares or rectangles.
+Un atributo grid es como una matriz, es una red de líneas que se cruzan unas a
+otras para formar una serie de rectángulos o cuadrados.
 
-These special actions render any `CocosNode` object (`Layer`, `Scene`, etc.) into the
-grid, and you can transform the grid by moving it's vertices.
+Estas acciones especiales distribuyen cualquier objeto `CocosNode` (`Layer`, `Scene`, etc.)
+en el grid, y puedes transformar este grid moviendo sus vértices.
 
-There are 2 kind of grids: ``tiled`` grids and ``non-tiled`` grids. The difference is that
-the ``tiled`` grid is composed of individual tiles while the ``non-tiled`` grid is
-composed of vertex.
+Hay dos tipos de grid: ``tiled`` (en mosaico) y ``non-tiled`` (sin mosaico). La
+diferencia está en que el grid en mosaico está compuesto por mosaicos individuales
+mientras que el otro grid se compone de vértices.
 
 .. image:: tiled_and_nontiled_grid.png
 
-The grids has 2 dimensions: ``rows`` and ``columns``, but each vertex of the grid has
-3 dimension: ``x``, ``y`` and ``z``. So you can create 2d or 3d effects by transforming
-a ``tiled-grid-3D`` or a ``grid-3D`` grid.
+El grid tiene dos dimensiones: ``rows`` (filas) y ``columns`` (columnas) pero
+cada vértice de la grilla tiene tres dimensiones: ``x``, ``y`` y ``z``. Así puedes
+crear efectos 2d o 3d haciendo transformaciones de grillas 3d con o sin mosaico.
 
-You can improve the quality of the effect by increasing the size of the
-grid, but the effect's speed will decrease.
+Se puede mejorar la calidad de los efectos aumentando el tamaño de la grilla, 
+pero la velocidad del efecto disminuye.
 
-A grid of size (16,12) will run fast in most computers but it won't look
-pretty well. And a grid of (32,24) will look pretty well, but in won't
-run fast in some old computers.
+Un tamaño de grilla (16, 12) hará que la velocidad sea mayor en casi cualquier
+computadora pero no se verá demasiado bien. Y una grilla de (32, 24) se verá
+mejor, pero la velocidad no será tan buena en computadoras viejas.
 
-How they work
-^^^^^^^^^^^^^
+Cómo Funcionan
+^^^^^^^^^^^^^^
 
-Each frame the screen is rendered into a texture. This texture is transformed into a ``vertex array``
-and this ``vertex array`` (the grid!) is transformed by the grid effects.
-Finally the ``vertex array`` is rendered into the screen.
+En cada cuadro la pantalla se convierte en una textura. Esta textura se transforma en un arreglo de vértices
+y ese arreglo de vértices (la grilla!) es modificado por los efectos de grilla. Finalmente el arreglo de 
+vértices se convierte en la pantalla.
 
-For more information about the internals refer to:
- - :class:`~cocos.grid.TiledGrid3D` and :class:`~cocos.actions.basegrid_actions.TiledGrid3DAction` for ``tiled`` grids
- - :class:`~cocos.grid.Grid3D` and :class:`~cocos.actions.basegrid_actions.Grid3DAction` for ``non-tiled`` grids
+Para más detalle sobre cuestiones internas ver:
+ - :class:`~cocos.grid.TiledGrid3D` y :class:`~cocos.actions.basegrid_actions.TiledGrid3DAction` para las grillas ``tiled`` (con mosaico)
+ - :class:`~cocos.grid.Grid3D` y :class:`~cocos.actions.basegrid_actions.Grid3DAction` para las grillas ``non-tiled`` (sin mosaico)
 
-
-For example, if you have an scene or layer that renders this image:
+Por ejemplo, si tienes una escena o capa que convierte a esta imagen:
 
 .. image:: original_image.png
 
-...we can transform that image into this one using the :class:`~cocos.actions.grid3d_actions.Ripple3D` action.
-As you can see from the *wired* image, it is using a grid of 32x24 squares,
-and the grid is *non-tiled* (all the squares are together).
+...Podemos transformar la imagen en esta otra usando la acción :class:`~cocos.actions.grid3d_actions.Ripple3D`.
+Como puedes ver en la imagen **de alambres**, esta usando una grilla de 32x24 cuadrados,
+y la grilla es *sin mosaico* (todos los cuadros están unidos).
 
 .. image:: effect_ripple3d.png
 .. image:: effect_ripple3d_grid.png
 
-...or we can transform it into this one using the :class:`~cocos.actions.tiledgrid_actions.FadeOutTRTiles` action.
-As you can see from the *wired* image, it is using a grid of 16x12 squares,
-and the grid is *tiled* (all the squares/tiles can be separated).
+...o podemos transformarla en esta otra usando la acción :class:`~cocos.actions.tiledgrid_actions.FadeOutTRTiles`.
+Como puedes ver en la imagen **de alambres**, está usando una grilla de 16x12 cuadrados,
+y la grilla es *con mosaico* (todos los cuadrados/mosaicos se pueden separar).
 
 .. image:: effect_fadeouttiles.png
 .. image:: effect_fadeouttiles_grid.png
 
 
-3D actions
-^^^^^^^^^^
+Acciones 3D
+^^^^^^^^^^^
 
-Action names that has the '3D' characters on it's name means
-that they produce a 3D visual effects by modifying the z-coordinate
-of the grid.
+Los nombres de acción que tienen las letras '3D' indican que producen un
+efecto visual 3D al modificar la coordenada z de la grilla.
 
-If you're going to use any '3D' action, probably you will want to 
-enable the OpenGL depth test. An easy way to do that is by calling
-the Director's `set_depth_test` method.
+Si vas a utilizar alguna acción  '3D', probablemente querrás habilitar las
+pruebas de profundidad de OpenGL. Una forma fácil de hacer esto es llamar al
+método `set_depth_test` del Director.
 
 
-Index of grid effects
-^^^^^^^^^^^^^^^^^^^^^
+Índice de efectos de la grilla
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You can find all the `Grid3DAction` actions here:
+Se pueden hallar todas las acciones `Grid3DAction` aquí:
  - :mod:`cocos.actions.grid3d_actions`
 
-And all the `TiledGrid3DAction` actions here:
+Y todas las acciones `TiledGrid3DAction` aquí:
  - :mod:`cocos.actions.tiledgrid_actions`
 
 
 
-Examples
+Ejemplos
 ^^^^^^^^
 
-Some examples::
+Algunos ejemplos::
 
-    # effect applied on a Scene
+    # efecto aplicado a una escena
     scene.do( Twirl( grid=(16,12), duration=4) )
 
-    # effect applied on a Layer
+    # efecto aplicado a una capa
     layer1.do( Lens3D( grid=(32,24), duration=5 )
 
-    # effect applied on a different Layer
+    # efecto aplicado a otra capa
     layer2.do( Waves( grid=(16,12), duration=4) + Liquid( grid=(16,12), duration=5 ) )
     
-Working samples can be found as ``test/test_<action name>.py`` , like ``test/test_lens_3d.py``
+Se pueden consultar ejemplos ejecutables como ``test/test_<nombre de la acción>.py`` , por ejemplo ``test/test_lens_3d.py``
 	
     
-Creating your own actions
--------------------------
+Creando tus propias acciones
+----------------------------
 
-Creating your own actions is pretty easy. You should familiarize yourself with this concepts, 
-because actions are very powerful and can be combined with another actions to create more actions. 
+Es fácil crear tus propias acciones. Deberías familiarizarte con estos conceptos,
+porque las acciones son muy potentes y se pueden combinar con otras acciones para crear más acciones.
 
-For example, there is the Blink action. It is implemented by subclassing `IntervalAction`, 
-but you could actually do something like::
+Por ejemplo, está la acción Blink (parpadeo). Está implementada como subclase de `IntervalAction`,
+pero podrías fácilmente hacer algo como::
 
     def Blink(times, duration): 
         return (
@@ -285,53 +284,53 @@ but you could actually do something like::
             Show() + Delay(duration/(times*2)) 
         ) * times
     
-Basic Internals
-^^^^^^^^^^^^^^^
+Cuestiones básicas internas
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-All actions work on a `target`. Its their callers responsibility to set 
-the target to the correct element. This allows the user to instantiate an action and then apply the same
-action to various different elements. All cocosnodes can be a target for an action.
+Toda acción se aplica a un `target` u objeto destino. Establecer el objeto
+correcto como target es responsabilidad del que invoca la acción. Esto permite
+al usuario crear instancias de acciones y luego aplicar las mismas acciones a
+distintos elementos. Cualquier elemento cocosnode puede ser target de una acción.
 
-You will not know who the target is when `__init__` or `init` is called, but you will when `start` is called. If 
-you are making an action that takes more actions as parameters, it is your responsibility to:
+No se sabe quién es el target al momento de llamar a `__init__` o `init`, pero si es posible saberlo cuando se
+llama a `start`. Si estás creando una acción que recibe otras acciones como parámetros, debes asegurarte de:
 
- * set the target
- * call the start method
- * call the stop method
+ * establecer el target
+ * llamar al método start
+ * llamar al método stop
 
-You can also override the `__reversed__` method. In this method you have to construct and return an action 
-that would be the reversed version of the action you are doing. For example, 
-in `Show()` we return `Hide()` as its reverse::
+Además puedes sobreescribir el método `__reversed__`. En ese método debes construir y devolver una acción
+que sería versión inversa de la acción que estás haciendo. Por ejemplo, en `Show()` se devuelve `Hide()`
+como su inversa::
 
     class Show( InstantAction ):
         "<snip>"
         def __reversed__(self):
             return Hide()
 
-Instant Actions
-^^^^^^^^^^^^^^^
+Acciones Instantáneas
+^^^^^^^^^^^^^^^^^^^^^
 
-Instant actions are actions that will take no time to execute. For example, `Hide()` 
-sets the target visibility to False. 
+Las acciones instantáneas son acciones que se realizan sin transcurso de tiempo.
+Por ejemplo, `Hide()` deshabilita la visibilidad del objeto destino.
 
-It is very easy to create an action using the CallFuncS action as a decorator::
+Es muy fácil crear una acción usando la acción CallFuncS como decorador::
 
     @CallFuncS
         def make_visible( sp ):
             sp.do( Show() )
         self.sprite.do( make_visible )
 
+ten en cuenta que make_visible no será una función normal que puedas llamar,
+será una acción. De esta forma puedes combinar la acción como cualquier otra.
 
-please note that make_visible will not be a regular function that you can call, 
-it will be an action. So you can compose it like any other action.
-
-If you want to subclass InstantAction, you will have to override:
-  - the `init` method to take the parameters you desire
-  - the `start` method to do the action
+Si quieres crear sublcases de InstantAction, deberás sobreescribir:
+  - el método `init` para que acepte los parámetros que desees
+  - el método `start` para realizar la acción
   
-Thats it.
+Eso es todo.
 
-For example, this is a minimal implementation of SetOpacity::
+Por ejemplo, esta es una implementación mínima de SetOpacity::
 
     class SetOpacity( InstantAction ):
         def init(self, opacity):
@@ -339,22 +338,23 @@ For example, this is a minimal implementation of SetOpacity::
         def start(self):
             self.target.opacity = self.opacity
 
-Interval Actions
-^^^^^^^^^^^^^^^^
+Acciones por Intervalos
+^^^^^^^^^^^^^^^^^^^^^^^
 
-Interval actions is where the fun is. With this actions you can specify
-transformations that take a finite time. For example, `MoveBy(how_much, duration)`.
+Las acciones por intervalos son las más divertidas. Con estas acciones puedes
+especificar transformaciones que llevan un tiempo determinado. Por ejemplo,
+`MoveBy(how_much, duration)`.
 
-The protocol for `IntervalAction` subclasses is the following:
-   - `init` method will be called. here you have to set your `duration` property.
-   - a copy of the instance will be made (you don't have to worry about this)
-   - `start` method will be called (`self.target` will be set)
-   - `update(t)` will most likely be called many time with t in [0,1) and t will monotonically rise.
-   - `update(1)` will be called.
-   - `stop()` will be called.
-   
-So its in update that you do your magic. For example, if you want to fade something out, 
-you can write something like::
+El protocolo de las subclases de `IntervalAction` es el siguiente:
+   - Se llama al método `init`. Aquí se debe establecer la propiedad `duration`
+   - Se hará una copia de la instancia (no debes ocuparte de eso)
+   - Se llama al método `start` (y se establece `self.target`)
+   - `update(t)` será llamado casi siempre periódicamente con valores dentro
+     del intervalo [0,1) y t aumentará en forma monótona.
+   - Se llama a `stop()`.
+
+De esta forma, la magia se realiza en el método update. Por ejemplo, si deseas
+que algo se desvanezca, puedes escribir algo como::
 
     class FadeOut( IntervalAction ):
         def init( self, duration ):
@@ -366,42 +366,44 @@ you can write something like::
         def __reversed__(self):
             return FadeIn( self.duration )
 
-The trick is that whoever is running your action will interpolate the values of t so that you 
-get called with `t==1` when your duration is up. This does not mean that `duration` seconds 
-have elapsed, but it usually does. If someone wants to make your action go twice as fast, they can feed you 
-updates at a different rate and you should not care.
+El truco consiste en que quien sea que esté corriendo tu acción interpolará los valores de t
+para avisarte que `t==1` cuando la duración se acabe. Esto no significa que han transcurrido
+`duration` segundos, pero por lo común coincide. Si alguien quiere hacer que tu acción vaya
+el doble más rápido, puede aumentar las actualizaciones a una frecuencia distinta y tu no
+necesitas preocuparte.
 
-Also, this allows us to change the interpolation method. We usually use linear interpolation, 
-but `AccelDeccel`, for example, uses a sigmoid function so that is goes slower at the ends.
+Además, esto permite cambiar el método de interpolación. Normalmente usamos interpolación lineal,
+pero `AccelDeccel`, por ejemplo, usa una función sigmoide para que se haga más lenta al finalizar.
 
 
-Grid Actions
-^^^^^^^^^^^^
+Acciones de grillas
+^^^^^^^^^^^^^^^^^^^
 
-These are `IntervalAction` actions, but instead of modifying 
-*normal* attributes like *rotation*, *position*, *scale*, they modify the *grid*
-attribute. 
+Son acciones tipo `IntervalAction`, pero en lugar de modificar atributos
+*normales* como *rotation*, *position*, *scale*, modifican el atributo *grid*
 
-Let's see in detail how to build a basic *non-tiled-grid* action::
+Veamos en detalle cómo construir una acción básica *non-tiled-grid* (de grilla
+sin mosaico)::
 
     class Shaky3D( Grid3DAction):
 
-*Shaky3D* is a subclass of `Grid3DAction`, so we are building a *non-tiled* action. If we want to 
-create a *tiled* action, we need to subclass from the `TiledGrid3DAction` class::
+*Shaky3D* es una subclase de `Grid3DAction`, y por lo tanto estamos creando una
+acción *non-tiled* (sin mosaico). Si deseamos crear una acción *tiled* (con
+mosaico), necesitamos crear una subclase de `TiledGrid3DAction`::
 
         def init( self, randrange=6, *args, **kw ):
             '''
-            :Parameters:
+            :Parámetros:
                 `randrange` : int
-                    Number that will be used in random.randrange( -randrange, randrange) to do the effect
+                    Número que será usado en random.randrange( -randrange, randrange) para crear el efecto
             '''
             super(Shaky3D,self).init(*args,**kw)
 
-            #: random range of the shaky effect
+            #: intervalo aleatorio del efecto shaky
             self.randrange = randrange
 
-Our class receives the ``randrange`` parameter, so we save it, and we call ``init`` of our
-super class::
+Nuestra clase recibe el parámetro ``randrange``, así que lo guardamos, y llamamos al ``init``
+de la clase super::
 
         def update( self, t ):
             for i in xrange(0, self.grid.x+1):
@@ -413,15 +415,14 @@ super class::
 
                     self.set_vertex( i,j, (x,y,z) )
 
-Like any other `IntervalAction` action the ``update`` method is going to be
-called once per frame. So, our *Shaky3D* effect will modify the ``x``,``y``
-and ``z`` coordinate by a random number that is calculated by the
-``random.randrange`` function.
+Como en cualquier otra acción `IntervalAction`, el método ``update`` será llamado
+una vez por cuadro. De esta forma, nuestro efecto *Shaky3D* modificará las
+coordenadas ``x``, ``y`` y ``z`` con un número aleatorio que se obtiene en la
+función ``random.randrange``.
 
-The `get_original_vertex` method returns the original coordinates of the vertex
-``x`` and ``y``, while the `get_vertex` method returns the current coordinates
-of the vertex ``x`` and ``y``.
+El método `get_original_vertex` devuelve las coordenadas ``x`` e ``y`` originales
+del vértice, mientras que el método `get_vertex` devuelve las coordenadas ``x``
+e ``y`` actuales del vértice.
 
-
-XXX: Explain how to build a Tiled Action
-XXX: How to use: `get_original_tile` and `get_tile`
+XXX: Explicar cómo se crea una Acción con mosaico
+XXX: Cómo usar: `get_original_tile` y `get_tile`

@@ -4,192 +4,200 @@ CocosNodes
 .. contents::
     :local:
 
-CocosNode Functionality
------------------------
+Propiedades de CocosNode
+------------------------
 
-The fact that all objects depicting the scene are CocosNodes subclasses means that they share a common core of characteristics and functionalities. You know for one and you know for all.
+El hecho de que todos los objetos que construyen la escena sean subclases de CocosNode da cuenta de cómo comparten un núcleo de
+características y funcionalidades. Conocer a uno basta para conocer a todos.
 
-The common core can be broken by functionality in
+El núcleo común se puede dividir por funcionalidad en
 
-Parent-child
-^^^^^^^^^^^^
 
-    - .add(self, child, z=0, name=None ): Adds a child, raises exception Name already exists if duplicated
-    - .remove(self, name_or_obj): Removes a child given its name or object, raises exception Child not found if not present
-    - .kill(self): Remove itself from its parent
-    - .parent: property giving the parent node or None
-    - .get_ancestor(self, klass): Returns the first ancestor that isinstance of klass, or None
-    - .get_children(self): Returns a list with the node children, order is back to front (ascending z)
-    - .get(self, name): Gets a child given its name, raises exception Child not found if not present
-    - operator in , as 'in node1 in node2': returns True if and only if node1 is child of node 2
+Padre-hijo
+^^^^^^^^^^
 
-`Parent-Child examples`_
+    - .add(self, child, z=0, name=None ): Agrega un hijo, genera una excepción de nombre duplicado si lo hubiera
+    - .remove(self, name_or_obj): Elimina un hijo según el nombre u objeto como parámetro. Genera una excepción de hijo no
+      encontrado en caso de no existir
+    - .kill(self): Se elimina a sí mismo del padre
+    - .parent: propiedad que devuelve el nodo padre o None
+    - .get_ancestor(self, klass): Devuelve el primer ancestro que sea instancia de klass, o None
+    - .get_children(self): Devuelve una lista de hijos, con orden de atrás hacia adelante (ascendente en z)
+    - .get(self, name): Obtiene un hijo según su nombre, genera una excepción de hijo no encontrado de no existir
+    - operador in, como en 'node1 in node2': devuelve True si y solo si node1 es hijo de node2
 
-Spatial Placement
+`Ejemplos de padre-hijo`_
+
+Ubicación espacial
+^^^^^^^^^^^^^^^^^^
+
+La posición de un nodo se define relativa a su nodo padre, más precisamente respecto de la posición del padre.
+
+    - .x, .y .position: propiedades que devuelven la posición relativa al origen del padre; al actualizar x o y automáticamente actualiza la posición. A la inversa también se cumple.
+    - .anchor_x, .anchor_y, anchor: propiedades que devuelven el centro para cambio de tamaño y rotación, automáticamente mantienen la relación anchor == (anchor_x, anchor_y). Nótese que distintas subclases de CocosNode pueden tener distintos valores por defecto para anchor.
+    - .scale : 1.0 es el tamaño por defecto, con 2.0 el nodo duplicará su tamaño visible.
+    - .scale_x, .scale_y : coeficientes de cambio de tamaño por eje. El coeficiente total en el eje x es .scale * scale_x, y otro tanto para el eje y
+    - .rotation : rotación en grados
+
+`Muestras de Ubicación Espacial`_ ; además muchos de los script en el directorio tests hacen ubicación explícita.
+
+Entrando o Saliendo de la Escena Activa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    - .on_enter(self): actúa cuando se agrega a un objeto padre si el padre pertenece a la escena activa o si toda la escena se activa
+    - .on_exit(self): actúa cuando se elimina un objeto del padre en la escena activa o si toda la escena se desactiva
+
+    
+Conversión Gráfica (Rénder)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    - .visit(self): hace rénder de sí mismo y sus hijos. El orden de rénder es hijos con z <= 0, el objeto en sí, hijos con z > 0
+    - .draw(self): se dibuja a sí mismo
+    - .transform(self): ayudante para draw y visit, maneja los cambios de coordenadas de OpenGL necesarios para el rénder según posición, anclaje, tamaño y rotación
+    - .camera: en lugar de las usuales posición, anclaje, tamaño y rotación utiliza un gluLookAt especial que también admite z. Esto se usa en raras ocasiones, por lo común en efectos especiales para transiciones.
+
+    
+Manejo del tiempo
 ^^^^^^^^^^^^^^^^^
 
-A node position is defined relative to the parent node, most precisely with respect the parent position.
-
-    - .x, .y .position: properties giving position relative to parent origin; updating x or y automatically updates position, the reverse is also true.
-    - .anchor_x, .anchor_y, anchor: properties giving the center for the scale and rotation, they automatically maintain the relation anchor == (anchor_x, anchor_y). Notice that different CocosNodes subclasses can have different default values for anchor.
-    - .scale : 1.0 is the default scale, with 2.0 the node will double its apparent size.
-    - .scale_x, .scale_y : per axis scaling factors. The total scaling in axis x is .scale * .scale_x , and analogous for axis y
-    - .rotation : in degrees
-
-`Spatial Placement snippets`_ ; also most of scripts in directory tests do explicit placement.
-
-Going in or out of the active scene
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-    - .on_enter(self): called if added to a parent while parent in the active scene or if the entire scene goes active
-    - .on_exit(self): called if removed from parent while parent in the active scene or if the entire scene
-
-    
-Render
-^^^^^^
-
-    - .visit(self): renders itself and its children. Render order is children with z <= 0, itself, children with z > 0
-    - .draw(self): draws itself
-    - .transform(self): helper for draw and visit, handles the openGL coordinate changes needed to render mandated by position, anchor, scale and rotation
-    - .camera: instead of the stock position, anchor, scale and rotation uses a custom gluLookAt that also allows z. This is rarely used, usually by special effects in transitions.
-
-    
-Time management
-^^^^^^^^^^^^^^^
-
-    - .schedule_interval(self, callback, interval, \*args, \*\*kwargs): Schedule a function to be called every interval seconds.
-    - .schedule(self, callback, \*args, \*\*kwargs): Schedule a function to be called every frame.
-    - .unschedule(self, callback): Remove a function from the schedule.
-    - .pause_scheduler(self): Time will stop passing for this node: scheduled callbacks will not be called, worker actions will not be called
-    - .resume_scheduler(self): Time will continue/start passing for this node and callbacks will be called, worker actions will be called
-
-    
-Automated changes along the time (actions management)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-    - .do(self, template_action, target=None): most of the time it is called with target=None, which result in target being self. The action will perform a potentially gradual change in target. Returns the worker action, which is the object doing the changes. You must save a reference to the worker if you plan to call later to .action_remove
-    - .action_remove(self, worker_action): the worker action will terminate
-    - .pause(self): Suspends the execution of actions.
-    - .resume(self): Resumes the execution of actions.
-    - .stop(self): All actions scheduled in this node are removed, stop method will be called for each action.
-    - .are_actions_running(self): True or False
-  
-The automated changes are performed by a collaboration between :class:`~cocos.cocosnode.CocosNode` instances and :class:`Action` instances.
-
-`Automated changes along the time snippets`_
-Also the test directory has many samples like test_accel*.py, test_blink.py, test_callfunc*.py and others.
+    - .schedule_interval(self, callback, interval, \*args, \*\*kwargs): Programa una función para que sea llamada cada cantidad de segundos especificados en interval.
+    - .schedule(self, callback, \*args, \*\*kwargs): Programa una función que sea llamada en cada cuadro.
+    - .unschedule(self, callback): Elimina una función programada.
+    - .pause_scheduler(self): El tiempo dejará de transcurrir para este nodo: las funciones programadas no se llamarán, las acciones de rutinas tampoco
+    - .resume_scheduler(self): El tiempo correrá o seguirá corriendo y se activarán las funciones programadas y las acciones de rutinas
 
 
-Brief tour of built-in CocosNode subclasses
--------------------------------------------
+Cambios automatizados a lo largo del tiempo (manejo de acciones)    
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    - .do(self, template_action, target=None): la mayoría de las veces se lo llama con target=None, que da como resultado que target sea self. La acción realizará un cambio gradual en principio sobre target. Devuelve la acción de rutinas, que es el objeto que hace los cambios. Debes guardar una referencia a la rutina su planeas llamar más adelante a .action_remove
+    - .action_remove(self, worker_action): finalizará la acción de rutinas
+    - .pause(self): Suspende la ejecución de acciones.
+    - .resume(self): Continua la ejecución de acciones.
+    - .stop(self): Todas las acciones en este nodo se eliminan, el método stop será llamado para cada acción.
+    - .are_actions_running(self): Informa si hay acciones corriendo. Devuelve True o False
+
+Los cambios automatizados son realizados en conjunto entre instancias de :class:`~cocos.cocosnode.CocosNode` y :class:`Action`
+
+`Ejemplos de cambios automatizados en el tiempo`_
+
+Además el directorio test tiene muchos ejemplos como test_accel*.py, test_blink.py, test_callfunc*.py y otros.
+
+
+Breve recorrido por las subclases incorporadas de CocosNodes
+------------------------------------------------------------
 
 Scene
 ^^^^^
 
-The root of the tree depicting the full content to be displayed.
-To change between scenes you use director.
+La raiz del árbol que representa el total del contenido a mostrar.
+Para intercambiar escenas se usa el director.
 
-References: :ref:`guide Scene<guide_scene>` , :class:`api Scene<cocos.scene.Scene>`
+Referencias: :ref:`guía de Scene<guide_scene>` , :class:`api de Scene<cocos.scene.Scene>`
 
 
 TransitionScene
 ^^^^^^^^^^^^^^^
 
-Base class to implement a gradual change from one screen (scene) to other. Typical examples are fade in and fade out.
+Clase base para implementar un cambio gradual entre pantallas (escenas). Los ejemplos típicos son el fundido a negro
+y su inversa (fade in y fade out).
 
-Cocos provides a bunch of ready made scene transitions (sample code in test/test_transition_*.py)
+Cocos viene con un montón de transiciones entre escenas listas para usar (el código de ejemplo está en test/test_transition_*.py)
 
-References: :class:`api Scene <cocos.scenes.transitions.TransitionScene>`
+Referencias: :class:`api de Scene <cocos.scenes.transitions.TransitionScene>`
 
 
 Layer
 ^^^^^
 
-Helps to organize the view in the depth axis.
-Subclasses often offer specialized services to the childs (like ScrollingManager), and can be used to build higher order functionality (like Menu)
+Ayuda en la organización de la vista en el eje de la profundidad.
+Sus subclases a menudo ofrecen servicios especiales para sus hijos (como ScrollingManager), y se puede utilizar para crear funcionalidades de un orden superior (como Menu)
 
-References: :ref:`guide Layer<guide_layer>` , :class:`api Layer<cocos.layer.base_layers.Layer>`
+Referencias: :ref:`guía de Layer<guide_layer>` , :class:`api de Layer<cocos.layer.base_layers.Layer>`
 
 ColorLayer
 ^^^^^^^^^^
 
-The primary use is to provide a solid color background to a scene, also used to draw solid color rectangles.
+El uso principal es el de proveer de un color sólido al fondo de la escena, además se usa para dibujar rectángulos de color sólido.
 
-References: :class:`api ColorLayer<cocos.layer.util_layers.ColorLayer>`
+Referencias: :class:`api de ColorLayer<cocos.layer.util_layers.ColorLayer>`
 
 MultiplexLayer
 ^^^^^^^^^^^^^^
 
-Allows to show only one of his childs, and to select which one.
-An use case is when you want to show one of a number of menus.
+Permite mostrar solo uno de sus hijos, y elegir cuál mostrar.
+Un caso de uso es cuando quieres mostrar solo uno de un grupo de menús.
 
-References: :class:`api MultiplexLayer<cocos.layer.base_layers.MultiplexLayer>`
+Referencia: :class:`api de MultiplexLayer<cocos.layer.base_layers.MultiplexLayer>`
 
 ScrollingManager
 ^^^^^^^^^^^^^^^^
 
-Coordinates a number of ScrollableLayer to do scroll and parallax so that the scroll don't goes out of the the world.
+Coordina un número de ScrollableLayer para que desplace haciendo ajustes (paralaje) de manera que el desplazamiento no se vaya afuera del entorno.
 
-References: :class:`api ScrollingManager<cocos.layer.scrolling.ScrollingManager>`
+Referencia: :class:`api de ScrollingManager<cocos.layer.scrolling.ScrollingManager>`
 
 ScrollableLayer
 ^^^^^^^^^^^^^^^
 
-Used as childs of ScrollingManager, helps to manage scroll limits and parallax.
-You must set attributes px_with and px_height in a `ScrollableLayer` instance so restrictions in the scroll are enforced.
-If using parallax, it must be provided in the constructor.
+Usado como hijo de ScrollingManager, ayuda a manejar los límites de desplazamiento y paralaje.
+Debes establecer los atributos px_width y px_height en una instancia de `ScrollableLayer` para que las restricciones en el desplazamiento tengan efecto.
+Si se usa paralaje, este debe estar especificado en el constructor.
 
-References: :class:`api ScrollableLayer<cocos.layer.scrolling.ScrollableLayer>`
+Referencia: :class:`api de ScrollableLayer<cocos.layer.scrolling.ScrollableLayer>`
 
-RectMapLayer and HexMapLayer
+RectMapLayer y HexMapLayer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A tilemap is a world description where
- - the space is partitioned in a regular grid (rectangular or hexagonal in cocos)
- - it is known which associated image and game properties has each cell in the grid.
+Un mapa de mosaicos es una descripción del entorno donde
+ - el espacio está dividido en una grilla regular (rectangular u hexagonal en cocos)
+ - se conoce qué imagen asociada y cuáles propiedades del juego tiene cada celda de la grilla.
 
-`RectMapLayer` and `HexMapLayer` are usually created by tiles.load, and they care to display the world and give access to the cells properties.
+`RectMapLayer` y `HexMapLayer` son usualmente generados por tiles.load, y se encargan de mostrar el entorno y proveer de acceso a las propiedades de las celdas.
 
-Examples are test/test_tiles.py and test/test_platformer.py
+Los ejemplos se encuentran en test/test_tiles.py y test/test_platformer.py
 
-References: :class:`api RectMapLayer<cocos.tiles.RectMapLayer>` , :class:`api HexMapLayer<cocos.tiles.HexMapLayer>`
+Referencia: :class:`api de RectMapLayer<cocos.tiles.RectMapLayer>` , :class:`api de HexMapLayer<cocos.tiles.HexMapLayer>`
 
 PythonInterpreterLayer
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Used by director to show a python console that allows to inspect and modify the objects in the application using director.
-You don't instantiate manually an PythonInterpreterLayer, simply press ctrl + i (cmd + i on mac) to toggle the layer's visibility.
+Es usado por el director para mostrar una consola de python que permite inspeccionar y modificar los objetos en la aplicación que usen al director.
+No debes crear manualmente una instancia de PythonInterpreterLayer, simplemente presiona ctrl + i (cmd + i en mac) para mostrar u ocultar la capa del intérprete.
 
-References: :doc:`guide PythonInterpreterLayer<interpreter>` , :class:`api PythonInterpreterLayer<cocos.layer.python_interpreter.PythonInterpreterLayer>`
+Referencia: :doc:`guía de PythonInterpreterLayer<interpreter>` , :class:`api de PythonInterpreterLayer<cocos.layer.python_interpreter.PythonInterpreterLayer>`
 
 Sprite
 ^^^^^^
 
-Sprites allows to display an image in a rectangular area, which can be rotated,
-scaled and moved.
+Los sprite permiten mostrar una imagen en un área rectangular, que se puede rotar,
+cambiar de tamaño y mover.
 
-References: :class:`api Sprite<cocos.sprite.Sprite>`
+Referencia: :class:`api de Sprite<cocos.sprite.Sprite>`
 
 
-Animating a sprite
-++++++++++++++++++
+Animación de un sprite
+++++++++++++++++++++++
 
-Animation as in cartoon style animation, that is, replacing the image fast
-enough to give the illusion of movement, can be accomplished by:
+La animación al estilo de los dibujos animados, es decir, el reemplazo de la
+imagen lo suficientemente rápido para dar la ilusión del movimiento, se puede
+lograr por:
 
-- using an animated .gif file as source for the image
-- passing a pyglet.image.Animation as image, which collects a number of images
-- have an array of images and let your code assign to the sprite image member
+- el uso de un .gif animado como origen de la imagen
+- el uso de un elemento pyglet.image.Animation como imagen, que consiste en una serie de imágenes
+- el uso de un arreglo con varias imágenes y código que asigne distintos elementos del arreglo a la propiedad image del sprite
 
-Performance Considerations
-++++++++++++++++++++++++++
+Consideraciones sobre rendimiento
++++++++++++++++++++++++++++++++++
 
-Sprites are not suitable for effects that piles a lot of semitransparent images
-to render things like smoke or poisoning fog. Use particle systems or custom
-CocosNode s managing vertex lists for that.
+Los sprite no son adecuados para efectos que incluyan numerosas imágenes
+semitransparentes para convertirlas en gráficos como en el humo o la niebla
+venenosa. En ese caso hay que usar sistemas de partículas u objetos CocosNode
+personalizados que puedan manejar listas de vértices.
 
-If your scene has less than 25 sprites, you can add directly to the
-scene, like::
+Si tu escena tiene menos de 25 sprite, puedes agregarlos directamente a la
+escena, de esta forma::
 
     class TLayer(cocos.layer.Layer):
         is_event_handler = True
@@ -206,16 +214,17 @@ scene, like::
     self.time = 0.0
     self.schedule(self.update)
 
-When you have between 25 and 100 visible sprites, moving at each frame, you
-should add one or more BatchNode s at some level in the scene and add the
-sprites to them. Even only one batch can give you 4x fps::
+Si tienes entre 25 y 100 sprite visibles, en movimiento en cada cuadro,
+deberías agregar uno o más objetos BatchNode según haga falta en la escena
+y asignarles los sprite. Incluso un solo BatchNode te puede cuadruplicar los
+cuadros por segundo::
 
     class TLayer(cocos.layer.Layer):
         is_event_handler = True
             def __init__(self):
                 cocos.layer.Layer.__init__(self)
                 batch = cocos.batch.BatchNode()
-                self.add(batch) # we add a batch to the layer ...
+                self.add(batch) # agregamos un batch a la capa ...
                 world_width, world_height = director.get_window_size()
                 rand_color = [255, 0, 0]
                 icolor = 0
@@ -223,170 +232,177 @@ sprites to them. Even only one batch can give you 4x fps::
                     ball = Ball((world_width*random.random(), world_height*random.random()), color=rand_color)
                     rand_color[icolor] = random.randint(50, 255)
                     icolor = (icolor + 1)%len(rand_color)
-                    batch.add(ball) # see ? we add sprites to the batch, not the layer
+                    batch.add(ball) # ves ? se asignan los sprite al batch, no a la capa
                 self.batch = batch
                 self.time = 0.0
                 self.schedule(self.update)
 
-With more than 100 visible, moving at each frame sprites, you will need to
-optimize further to run at 60 fps in weak hardware like netbooks, old desktops,
-cheap new desktops.
-You can look at cocos particle systems and the section graphics in pyglet
-programing guide for ideas.
+Con más de 100 visibles, al mover los sprite en cada cuadro, necesitarás
+mayor optimización para que la aplicación corra a 60 fps en un equipo limitado,
+como una notebook, máquinas de escritorio viejas o de bajo costo.
+Para más ejemplos puedes consultar los sistemas de partículas de cocos y
+la sección de gráficos de la guía del programador de pyglet.
 
-For a ballpark data point, a 2008 low gamming spec machine (athon 5200, radeon 4650) gives::
+Con la prueba ballpark, una máquina de bajas especificaciones para juegos (athlon 5200, radeon 4650) da estos resultados::
 
     numballs    fps
         250     98
         500     54
         750     36
 
-Notice that sprites out of view has a fraction of the cost that visible sprites: they are discarded at the openGL geometry stage (in most of openGL implementations)
+Ten en cuenta que los sprite fuera de la vista representan una parte menor del costo de los sprite visibles: ellos son descartados en el momento del cálculo geométrico de openGL (en la mayoría de las implementaciones de openGL)
 
     
-Particle Systems
-^^^^^^^^^^^^^^^^
+Sistemas de Partículas
+^^^^^^^^^^^^^^^^^^^^^^
 
-Certain effects are best rendered as a big number of translucent, colored images, by example explosions and smoke.
-Cocos provides the base class :class:`~cocos.particle.ParticleSystem` to efficiently render those entities, and some specialized subclasses in module :mod:`cocos.particle_systems` like `Fireworks`, `Spiral`, `Meteor`, `Sun`, `Fire`, `Galaxy`, `Flower`, `Explosion`, `Smoke`.
+Algunos efectos se convierten mejor como un gran número de imágenes coloreadas y semitransparentes, por ejemplo las explosiones y el humo.
+Cocos viene con una clase base :class:`~cocos.particle.ParticleSystem` que convierte eficientemente esos elementos, y algunas subclases
+especializadas en el módulo :mod:`cocos.particle_systems` como `Fireworks`, `Spiral`, `Meteor`, `Sun`, `Fire`, `Galaxy`, `Flower`, `Explosion` y `Smoke`.
 
-The most common method to customize particle systems is to subclass one of the cocos particle systems and modify some of the class members defining its behavior.
+El método más común para personalizar sistemas de partículas es el de crear una subclase de uno de los sistemas de partículas y modificar algunos de los elementos de la clase que definen su comportamiento.
+Si modificas la textura de la partícula recuerda cargarla con pyglet.image.load, no con pyglet.resource.image
+Por supuesto, una mejor personalización se logra creando sublcases y personalizando el código. 
 If you change the particle texture remember to load it with pyglet.image.load, not pyglet.resource.image
 Of course, deeper customization can be achieved with subclassing and code customization.
 
-Look at test/test_particle_*.py for sample code.
+Consulta test/test_particle_*.py para código de ejemplo.
 
 TextElement, Label, HTMLLabel, RichLabel
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Overall opacity, Family and Font size can be specified for all.
+Todas las clases admiten opacidad promedio, familia y tamaño de fuente.
 
-:class:`~cocos.text.TextElement`: base class for all cocos text. Holds internally (member 'element') a suitable pyglet text object, providing the CocosNode interface and pyglet Batch to store parts.
-Features other than opacity and the common cocosnode ones should be accessed trough the instance.element.   
+:class:`~cocos.text.TextElement`: clase base para todo texto en cocos. Mantiene internamente (propiedad 'element') un objeto de texto de
+pyglet apropiado, que provee tanto la interfaz CocosNode como el Batch de pyglet para almacenar partes.
+Otras funcionalidades excepto opacidad y las que corresponden a cocosnode deben ser manejadas a través de instancia.element.
 
-:class:`~cocos.text.Label`: provide the most simple text display; color can also be set.
+:class:`~cocos.text.Label`: produce el texto más simple; también permite establecer el color.
  
-:class:`~cocos.text.HTMLLabel`: a slightly more powerful label, it can use mixed styles. Uses HTML syntax for text and styles; opacity as a whole can be set.
+:class:`~cocos.text.HTMLLabel`: un tipo de Label más potente, soporta mezcla de estilos. Usa la sintaxis de HTML para el texto y los estilos; permite configurar la opacidad (para todo el texto).
 
-:class:`~cocos.text.RichLabel`: Allows rich text attributes.
+:class:`~cocos.text.RichLabel`: Permite el uso de propiedades de texto enriquecido.
 
-Look for examples at test/test_label_*.py, test/test_htmllabel_*.py, test/test_rich_label.py
+Hay más ejemplos en test/test_label_*.py, test/test_htmllabel_*.py y test/test_rich_label.py
 
 Menu
 ^^^^
 
-- Does the layout of menu items
-- Handles navigation between menu items
-- Passes to the items the desired animation to play when the focus changes from one to another item
+- Organiza la presentación de los elementos del menú
+- Maneja la exploración entre elementos del menú
+- Establece qué animación se debe reproducir cuando el foco cambia entre un elemento del menú y otro
 
-Look for examples at test/test_menu_*.py
+Ejemplos en test/test_menu_*.py
 
-References: :class:`~cocos.menu.Menu`
+Referencia: :class:`~cocos.menu.Menu`
  
-Menu items
-^^^^^^^^^^
+Elementos del Menú
+^^^^^^^^^^^^^^^^^^
 
-:class:`~cocos.menu.MenuItem`: A menu item that shows text
+:class:`~cocos.menu.MenuItem`: Un elemento del menú que muestra un texto
 
-:class:`~cocos.menu.ImageMenuItem`: A menu item that shows a image and optionally text 
+:class:`~cocos.menu.ImageMenuItem`: Elemento del menú que muestra una imagen y opcionalmente texto
 
-:class:`~cocos.menu.MultipleMenuItem`: Allows to cycle trough a customizable list of options
+:class:`~cocos.menu.MultipleMenuItem`: Permite recorrer una lista configurable de opciones
 
-:class:`~cocos.menu.ToggleMenuItem`: Exposes a on/off selection
+:class:`~cocos.menu.ToggleMenuItem`: Muestra una opción de encendido/apagado
 
-:class:`~cocos.menu.EntryMenuItem`: Exposes a label and a text entry field
+:class:`~cocos.menu.EntryMenuItem`: Muestra una etiqueta y un campo para introducir texto
 
-:class:`~cocos.menu.ColorMenuItem`: Allows to select a color
+:class:`~cocos.menu.ColorMenuItem`: Permite elegir un color
 
 Look at test/test_menu_items.py for sample code.
 
-Creating your CocosNode subclasses
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Creando tus propias subclases de CocosNode
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-TODO: explain how to build custom cocosnode objects,
-how to use `transform` , etc.
+TODO: explicar cómo construir objetos cocosnode personalizados, como usar
+`transform`, etc.
 
-CocosNodes Examples
--------------------
+Ejemplos de CocosNodes
+----------------------
 
-Parent-Child examples
-^^^^^^^^^^^^^^^^^^^^^
+Ejemplos de padre-hijo
+^^^^^^^^^^^^^^^^^^^^^^
 
-Building a scene, object instantiation omitted ::
+Construcción de una escena, la creación de la instancia se omite::
 
-    # a scene with 2 layers; the background would be seen behind the game layer because of z values
+    # una escena con 2 capas; el fondo se vería detras de la capa del juego por los valores de z
     scene.add( background_layer, z=0 )
     scene.add( game_layer, z=1 )
 
-    # the layer with 1 bloody pacman sprite
-    blody_pacman_sprite.position = (100, 100)
+    # la capa con un un sprite de bloody pacman
+    bloody_pacman_sprite.position = (100, 100)
     game_layer.add( bloody_pacman_sprite )
 
-    # the bloody pacman has two daggers !!!
+    # el bloody pacman tiene dos cuchillos !!!
     sprite.add( dagger_far_sprite, z=-1 )
     sprite.add( dagger_near_sprite, z=1  )
-    # the draw order is dagger_far, bloody_pacman, dagger_near
+    # el orden en que se dibujan es dagger_far, bloody_pacman, dagger_near
 
-    # also they are zombie alien cowboys in the game,
-    # so we add a bunch of them to the game_layer
+    # también hay alien zombie cowboy en el juego,
+    # así que agregamos algunos de ellos a la capa game_layer
     ...
  
-
-A dagger has touched a zombie alien cowboy so it wants to spawn a nasty blotch of green blood.
-We could add the blotch_sprite to the zac_sprite, an then the blotch will follow the zombie::
+Un cuchillo ha tocado a un alien zombie cowboy así que debemos crear una fea
+mancha de sangre verde. Podríamos agregar el blotch_sprite al zac_sprite, para
+que la mancha siga al zombie::
 
     zac_zprite.add(blotch_sprite, z = 1)
 
-or we could add to the game_layer, and the blotch will not follow the zombie::
+o podríamos agregarla a la capa game_layer, y la mancha no seguiría al zombie::
 
-    layer = zac_sprite.parent # should be game_layer, because our staggering
+    layer = zac_sprite.parent # debería ser game_layer
     layer.add(blotch_sprite)
 
-If for some ridiculous reason a dagger needs to grab a reference to the game_layer we could use 'get_ancestor'.
-Due to to way we staged the scene, we know game_layer is parent of bloody_pacman_sprite which is parent of the dagger. So::
+Si por alguna ridícula razón un cuchillo necesitara mantener una referencia con
+la capa game_layer podríamos usar 'get_ancestor'.
+Por la forma en que distribuimos la escena, sabemos que game_layer es padre de
+bloody_pacman_sprite, que es padre de dagger. Entonces::
 
     layer = dagger_near.get_ancestor(Layer)
 
-should produce game_layer.
+tendría que resultar en game_layer.
 
-A zombie is killed, we can retire from the scene with::
+Han matado a un zombie, podemos salir de la escena con::
 
     zac_sprite.kill()
 
-or with::
+o con::
 
     game_layer.remove(zac_sprite)
 
-or if we named it "T'chkss" when we added to the game_layer, like in::
+o si lo hemos llamado "T'chkss" al agregarlo al game_layer, de esta forma::
 
     game_layer.add(zac_sprite, name = "T'chkss", z=4)
 
-then we can retire it with::
+entonces podemos removerlo con::
 
     game_layer.remove("T'chkss")
 
-Note that in current cocos if you add with name then you should remove by name,
-else the name will become unusable for new additions.
+Ten en cuenta que en el cocos actual si agregas usando un nombre debes remover
+usando también un nombre, de lo contrario el nombre no estará disponible en
+nuevas adiciones.
 
-Spatial Placement snippets
-^^^^^^^^^^^^^^^^^^^^^^^^^^ 
+Muestras de Ubicación Espacial
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Example::
+Ejemplo::
 
-    # place the sprite in 320,240
+    # colocar el sprite en 320,240
     sprite.position = (320,240)
 
-or by using actions.
-Example::
+o utilizando acciones.
+Ejemplo::
 
-    # move the sprite to 320,240 in 5 seconds
+    # mover el sprite a 320,240 con una duración de 5 segundos
     sprite.do( MoveTo( (320,240, duration=2 ) )
 
-Automated changes along the time snippets
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Ejemplos de cambios automatizados en el tiempo
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     
-You can modify attributes to any `CocosNode` object.
-By example::
+Puedes modificar los atributos de cualquier objeto `CocosNode`.
+Por ejemplo::
 
     scene.do( ScaleTo(2, duration=2) )
 

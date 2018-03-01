@@ -1,186 +1,196 @@
 Basic Concepts
 ==============
 
-There are some basic concepts introduced in this library that you will
-need to know when developing a cocos2d application:
+Hay algunos conceptos básicos que se incluyen en esta librería que te harán
+falta cuando desarrolles una aplicación de cocos2d:
 
 .. contents::
     :local:
 
 .. _guide_scene:
 
-Scenes
-------
+Escenas
+-------
 
-A scene (implemented with the :class:`~cocos.scene.Scene` object) is a more or less
-independent piece of the app workflow.
-Some people may call them "screens" or "stages". Your app can have
-many scenes, but only one of them is active at a given time.
+Una escena (implementada en la clase :class:`~cocos.scene.Scene`) es una pieza más o
+menos independiente del flujo de trabajo de la aplicación.
+También se la puede llamar "pantalla" o "etapa". Tu aplicación puede tener muchas
+escenas, pero sólo una de ellas está activa en un momento determinado.
 
-For example, you could have a game with the following scenes:
-Intro, Menu, Level 1, Cutscene 1, Level 2, Winning cutscene,
-losing cutscene, High scores screen.
+Por ejemplo, podrías tener un juego con las siguientes escenas:
+Intro, Menú, Nivel 1, Transición 1, Nivel 2, Juego terminado (ganador),
+Juego terminado (perdedor), Tabla de puntajes.
 
-You can define every one of these scenes more or less as separate apps;
-there is a bit of glue between them containing the logic for connecting
-scenes (the intro goes to the menu when interrupted or finishing,
-Level 1 can lead you to the cutscene 1 if finished or to the losing
-cutscene if you lose, etc.).
+Puedes definir cualquiera de esas escenas más o menos como aplicaciones independientes;
+hay algunas conexiones lógicas entre ellas (la Intro va al Menú cuando se interrumpe o
+finaliza, el Nivel 1 te lleva a la Transición 1 si finaliza o a Juego Terminado cuando
+pierdes, etc.).
 
 .. figure:: scenes.png
 
-A scene is described in cocos2d as a tree of :class:`.CocosNodes` where the root is
-a :class:`.Scene` node, the most near descendants usually are :class:`.Layers`, and they
-hold and organize individual elements.
 
-Example for the main menu screen::
+Una escena en cocos2d está conformada por un árbol de elementos :class:`CocosNode` donde
+la raíz es un nodo de tipo :class:`.Scene` (escena), los descendientes más próximos normalmente
+son de tipo :class:`.Layer` (capa), y estos contienen y organizan los elementos individuales.
 
-	main_menu_scene : Scene node holding all the main menu elements
-		animated_background : Layer depicting an animated background
-			static_background : Sprite with a nice draw covering all the screen
-			far_trees : Layer holding the most distant trees
-				tree_1..tree_k : Sprites showing trees 
-			birds : Layer holding flying birds
-				bird_1..bird_n : Sprites showing birds
-			near_trees : Layer holding the most near trees
-				tree_1..tree_m : Sprites showing trees
-		main_menu : Menu, a Layer subclass provided by cocos that handles all the behavior
-					related to menu (key listening, highlight, select...)
-			item1 : MenuItem , 'play'
-			item2 : MenuItem , 'options'
-			item3 : MenuItem , 'quit'
 
-There is also a family of `Scene` subclasses called transitions (implemented with
-the :class:`~cocos.scenes.transitions.TransitionScene` object) which allow you to
-make transitions between two scenes (fade out/in, slide from a side, etc).
+Ejemplo de pantalla principal del menú::
 
-Since scenes are subclass of :class:`.CocosNode`, they can be transformed manually or
-by using actions.
-See :doc:`actions` for more details about actions.
+        escena_menu_principal : Scene que contiene todos los elementos del menú principal
+                fondo_animado : Layer con un fondo animado
+                        fondo_estatico : Sprite con un buen dibujo que abarca toda la pantalla
+                        arboles_lejanos: Layer conteniendo los árboles más distantes
+                                arbol_1 ... arbol_k : Sprites que muestran árboles
+                        pajaros : Layer conteniendo pájaros voladores
+                                pajaro_1 ... pajaro_n : Sprites mostrando aves
+                        arboles_cercanos : Layer conteniendo los árboles más cercanos
+                                arbol_1 ... arbol_m : Sprites mostrando árboles
+                menu_principal : Menu, una subclase de Layer que pertenece a cocos y que maneja
+                                        todo lo relacionado al menú (eventos de teclado,
+                                        resaltado, selección ...)
+			item1 : MenuItem , 'jugar'
+			item2 : MenuItem , 'opciones'
+			item3 : MenuItem , 'salir'
+
+Además hay una familia de subclases de `Scene` llamadas transiciones (implementadas
+en el objeto :class:`~cocos.scenes.transitions.TransitionScene`), que te permiten
+hacer transiciones entre dos escenas (fundidos, desplazamientos laterales, etc).
+
+Como las escenas son subclases de :class:`.CocosNode`, se pueden transformar manualmente
+o usando acciones.
+Ver :doc:`actions` para más información sobre acciones.
 
 Director
 --------
 
-The **director** is the component which takes care about going back and forth
-between scenes.
+El **director** es el componente que se ocupa de ir hacia adelante y hacia
+atrás entre escenas.
 
-The director is a shared (singleton) object. It knows which scene is currently
-active, and it handles a stack of scenes to allow things like "scene calls"
-(pausing a :class:`.Scene` and putting it on hold while other enters, and then returning
-to the original). The push, replacement or end of the current scene is made by director.
+El director es un objeto (singleton) compartido. Sabe qué escena está activa
+actualmente, y maneja una lista de escenas para permitir cosas como"llamados
+de escenas"
+(al pausar un objeto :class:`.Scene` y ponerlo en espera mientras entra otro, y luego
+regresando al original). Las modificaciones en la pila como agregar y reemplazar o finalizar
+la escena las hace el director.
 
-The director is also responsible for initializing the main window.
+El director también es el responsable de inicializar la ventana principal.
 
-To get the director object you do::
+Para obtener el objeto director debes hacer::
 
 	import cocos
 	from cocos.director import director
 
-Implementation lives in :mod:`cocos.director`
+La implementación está ubicada en :mod:`cocos.director`
 
 .. _guide_layer:
 
-Layers
-------
+Capas
+-----
 
-Layers helps you organize the scene in the back to front axis, for example
+Las capas te ayudan a organizar la escena múltiples planos, por ejemplo
 
-	- background : a fixed draw of landscape
-	- far : decorative trees and birds
-	- middle : platforms
-	- near : player, enemies, coins
-	- HUD : Heads Up Display to show game stats like life, energy
+        - fondo : un dibujo fijo que hace de paisaje
+        - lejos : árboles decorativos y aves
+        - medio : plataformas
+        - cerca : jugador, enemigos, monedas
+        - HUD : datos superpuestos para mostrar estadísticas del juego como vida y energía
 
-You can think layers as (usually) transparent sheets where the children are drawn, and the scene as the stack of sheets.
+Se puede pensar las capas (usualmente) como hojas transparentes donde los hijos se distribuyen,
+y la escena como una pila de hojas.
+
 
 .. image:: layers.png
 
-In non MVC (model - view - controller) design style, some code related to nodes interaction tends to float in the layer holding the entities, 
-providing higher functional units.
-For example, :class:`.Menu` is a Layer subclass that knows how to layout and animate items, read user inputs and do control flow.
+En estilos de diseño distintos a MVC (modelo - vista - controlador), parte del código relacionado
+con la interacción con nodos tiende a flotar sobre la capa que contiene las entidades, dando
+lugar a unidades funcionales superiores.
+Por ejemplo, :class:`Menu` es una subclase de Layer que sabe como organizar y animar los ítem,
+leer acciones del usuario y hacer el control de flujo.
 
-Layers are the ones defining appearance and behavior, so most of your programming
-time will be spent coding :class:`.Layer` subclasses that do what you need. 
+Las capas son las que definen la apariencia y el comportamiento, así que la mayor
+parte del tiempo lo emplearás programando subclases de :class:`Layer` que hagan lo
+que necesites.
 
-The :class:`.Layer` is where you define event handlers. Events are propagated to layers
-(from front to back) until some layer catches the event and accepts it.
+El :class:`.Layer` es donde defines los manejadores de eventos. Los eventos se propagan
+a las capas (de adelante hacia atrás) hasta que alguna capa lo detecte y lo acepte.
 
-Even if any serious app will require you to define some :class:`.Layer` subclasses, cocos2d
-provides some useful specialized layers:
+Aunque toda aplicación seria requiere definir alguna sublcase de :class:`Layer`, cocos2d
+cuenta con algunas capas especializadas que son útiles:
 
-	- :class:`.MultiplexLayer`, a group of layers where only one is seen at a time
-	- :class:`.ScrollingManager`, :class:`~cocos.layer.scrolling.ScrollableLayer`; does the logic to limit scroll to viewable areas
-	- :class:`.RectMapLayer`, :class:`.HexMapLayer`, :class:`.TmxObjectLayer`; displays a group of rectangular or hexagonal tiles or TMX objects
-	- :class:`.Menu`, implements simple menus
-	- :class:`.ColorLayer`, a solid color rectangle
-	- :class:`.PythonInterpreterLayer`, used by director to pop up an interactive console to peek and poke at the objects in our scene (ctrl + I to toggle on-off)
+	- :class:`.MultiplexLayer`, un grupo de capas donde solo una es visible cada vez
+	- :class:`.ScrollingManager`, :class:`~cocos.layer.scrolling.ScrollableLayer`; se encarga de la lógica para limitar el desplazamiento a un área visible
+	- :class:`.RectMapLayer`, :class:`.HexMapLayer`, :class:`.TmxObjectLayer`; muestra un grupo de divisiones rectangulares o hexagonales u objetos TMX
+	- :class:`.Menu`, implementa un sistema simple de menús
+	- :class:`.ColorLayer`, un rectángulo de color sólido
+	- :class:`.PythonInterpreterLayer`, es usado por el director para mostrar una consola interactiva para explorar los objetos en tu escena (ctrl + I para habilitar-deshabilitar)
 
-To make loading of appropriate assets easier you may override the ``__init__``
-method of your :class:`.Layer` subclass. This will be called when your Layer is
-created.
 
-Since layers are subclasses of :class:`.CocosNode`, they can be transformed manually or 
-by using actions.
-See :doc:`actions` for more detail about actions.
+Para cargar los recursos apropiadamente con más facilidad puedes sobreescribir el
+método ``__init__`` de tu subclase de :class:`.Layer`. Este será llamado cuando
+se cree tu capa.
+
+Como las capas son subclases de :class:`.CocosNode`, se pueden transformar manualmente o
+utilizando acciones. Ver :doc:`actions` para más detalles sobre acciones.
 
 
 Sprites
 -------
 
-A cocos2d' sprite is like any other computer sprite.
-It is a 2D image that can be moved, rotated, scaled, animated, etc. 
-
-Sprites (implemented using the :class:`.Sprite` class) can have other sprites
-as children. When a parent is transformed, all its children are transformed as well.
-
-Since sprites are subclass of :class:`.CocosNode`, they can be transformed manually
-or by using actions.
-See :doc:`actions` for more detail about actions.
+Un sprite de cocos2d es como cualquier otro sprite de computadora.
+Es una imagen 2d que se puede mover, rotar, escalar, animar, etc.
 
 
-Events
-------
+Los sprite (implementados utilizando la clase :class:`.Sprite`) pueden tener
+otros sprite hijos. Cuando el padre se transforma, todos sus hijos también
+se transforman.
 
-cocos2d uses `The pyglet Event Framework`_ to handle events.
+Como los sprite son subclases de :class`.CocosNode, se pueden transformar manualmente
+o usando acciones. Ver :doc:`actions` para más detalles sobre acciones.
 
-The pyglet event framework in a pinch
+
+
+Eventos
+-------
+
+cocos2d usa `The pyglet Event Framework`_ para manejar eventos.
+
+Miniresumen de pyglet event framework
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
- - you have **emitters** (instances of `pyglet.event.EventDispatcher <http://pyglet.readthedocs.io/en/pyglet-1.2-maintenance/api/pyglet/event/pyglet.event.EventDispatcher.html>`_)
+ - tienes **emitters** (instancias de `pyglet.event.EventDispatcher <http://pyglet.readthedocs.io/en/pyglet-1.2-maintenance/api/pyglet/event/pyglet.event.EventDispatcher.html>`_)
 
- - each emitter registers as many events as desired, each one identified by a
-   string (the event name)
+ - cada emitter puede registrar tantos eventos como se desee, cada uno identificado por una cadena (el nombre del evento)
 
- - to act over events, you register **listeners** with the emitter.
-   Essentially, you provide the emitter with a (<event name>, callable) and the
-   emitter will call the callable when <event name> happens.
-   Any number of listeners can register for a (emitter, <event name>) pair.
-   A listener can register to any number of emitters.
+ - para actuar según los eventos, se registran **listeners** con el emitter.
+   Básicamente, se provee al emitter de un (<nombre del evento>, función) y el emitter se encargará de llamar a la función cuando ocurra <nombre del evento>. Se pueden asociar ilimitados listeners a un par (emitter, <nombre del evento>). Un listener puede asociarse a ilimitados emitters.
 
- - example registration **emitter** events::
+ - ejemplo de registro de eventos **emitter**::
 
         class Bunker(pyglet.event.EventDispatcher):
             ...
             def building_update(self, dt):
                 ...
-            if self.elapsed_time>self.building_time:
-                self.dispatch_event('on_building_complete', self)
+                if self.elapsed_time>self.building_time:
+                    self.dispatch_event('on_building_complete', self)
 
-        def take_damage(self, damage):
-            self.dispatch_event('on_building_under_attack', self)
-            self.life -= damage
-            if self.life<0:
-                self.dispatch_event('on_building_destroyed', self)
+            def take_damage(self, damage):
+                self.dispatch_event('on_building_under_attack', self)
+                self.life -= damage
+                if self.life<0:
+                    self.dispatch_event('on_building_destroyed', self)
 
-        # following lines register the events that Bunker instances can emit
+        # Las líneas siguientes registran los eventos que pueden emitir
+        # las instancias de Bunker
         Bunker.register_event_type('on_building_complete')
         Bunker.register_event_type('on_building_under_attack')
         Bunker.register_event_type('on_building_destroyed')
 
-   Note that an event can carry zero, one or more arguments; here we send the
-   instance emitting the event.
 
- - example registration **listeners**::
+   Ten en cuenta que un evento puede recibir cualquier número de argumentos o
+   ninguno; aquí especificamos la instancia que emite el evento.
+
+
+ - ejemplo de registro de **listeners**::
      
         class Commander(object):
             def __init__(self, ...):
@@ -205,25 +215,24 @@ The pyglet event framework in a pinch
 
             def on_building_destroyed(self, building):
                 ...
-                
-   Note that the handlers accepts the parameters that the event carries.
-   The listener registration here works as:
 
-       - we pass a class instance to push_handlers
-       - pyglet will look at methods in this class instance whose name match
-         <event name> for any <event name> which the emitter registered, and
-         then register ( <event name>, obj.event_name ) for each match.
+   Ten en cuenta que los manejadores de eventos reciben los parámetros que a fueron pasados a los eventos.
+   El registro de manejadores de eventos funciona de este modo:
 
-   With this style of listener registration you should be careful when
-   registering for two emitters: if both emitters can generate 'on_cuack'
-   events and you register::
+       - se pasa una instancia de clase a push_andlers
+       - pyglet examina los métodos en esta instancia de clase que tengan el <nombre de evento> para cada <nombre de evento> que haya registrado el emitter, y luego registra los ( <nombre de evento>, obj.nombre_de_evento ) por cada coincidencia.
+
+
+   Con este tipo de registro de eventos debes tener cuidado cuando registras
+   para dos emitter: si ambos emitter pueden generar eventos 'on_cuack'
+   y tu registras::
 
         emitter1.push_handlers(obj)
         emitter2.push_handlers(obj)
 
-   then obj.on_cuack will be called by both emitters.
+   entonces obj.on_cuack será llamado por los dos emitter.
 
-   Another listener registration style is pushing explicit handlers::
+   Otro tipo de registro de listeners es agregar manejadores explícitos::
 
         bunker.push_handlers(
             self.on_building_complete,
@@ -231,49 +240,65 @@ The pyglet event framework in a pinch
             self.on_building_destroyed
             )
 
- - When you want a listener to stop receiving events from an emitter, you de-register the listener::
+ - Si quieres que un listener deje de recibir eventos de un emitter, desregistras el listener::
 
-        emitter.remove_handlers(...) # params as in push_handlers
-
- - Event propagation : The event is propagated to all handlers from the top of the emitter stack until one returns EVENT_HANDLED (which is the value True).
+        emitter.remove_handlers(...) # los parámetros igual que en push_handlers
 
 
-Cocos and events
-^^^^^^^^^^^^^^^^
+ - Propagación de eventos : Un evento se propaga a todos los manejadores desde lo más alto de la pila del emitter hasta que devuelve EVENT_HANDLED (cuyo valor es True).
 
-Besides using events to get user input ('on_key_press', 'on_mouse_move',...) or window status change ( 'on_activate', ... ),
-you can use events to decouple the model from the view in your app. The game Tetrico, to be found in samples/tetrico is an example of this usage.
 
-Cocos in general will **not** automatically handle listeners registration/de-registration, except for one special case: the emitter is director.window and the listener is a layer or scene
-Thus, for the general case, you must handle the push_handlers - remove_handlers thing by yourself.
-When your listener lives in a CocosNode, a good scheme is pushing handlers in the on_enter method and remove handlers in the on_exit method. This way, you are sure your handlers will not be called when the node is not in the active scene.
-Also, for custom events, it is a good practice to not use event names that director.window uses: that prevents unexpected double calls to the handler(s).
 
-For the special case that emitter is director.window and the listeners are layers or scenes, cocos can handle the registration / de-registration:
 
- - When a scene becomes active, it would walk the scene tree to allow layers autoregistering for director.window events.
-   The walk begins in the scene, and passes only to layer class children.
+Cocos y los eventos
+^^^^^^^^^^^^^^^^^^^
 
- - When prompted from the above walk, a layer whose class member is_event_handler has a True value, it will register itself as a director.window listener.
-   The registration will be in the form::
-          
+Aparte de usar eventos para obtener comandos del usuario ('on_key_press', 
+'on_mouse_move', ...) o cambios de status de la ventana ( 'on_activate', ...),
+puedes usar eventos para desacoplar el modelo de la vista en la aplicación. El juego
+Tetrico, que se puede ver en samples/tetrico es un ejemplo de esta técnica.
+
+Cocos en general **no** manejará automáticamente el registro/desregistro de listeners,
+salvo para un caso especial: cuando el emitter es director.window y el listener es una capa
+o escena. Por eso, para los casos comunes, debes manejar la cuestión push_handlers - remove_handlers
+por tu cuenta.
+Cuando tu listener pertenece a un CocosNode, un buen esquema consiste en agregar manejadores en el
+método on_enter y quitar los manejadores en el método on_exit. De esta forma, te aseguras de que
+tus manejadores no serán llamados cuando el nodo no está en la escena activa.
+Además, para eventos personalizados, es buena práctica no usar nombres de eventos que sean
+utilizados por director.window: esto evita llamadas duplicadas al manejador o manejadores.
+
+
+Para el caso especial en que el emitter es director.window y los listener son capas o escenas,
+cocos puede encargarse del registro / desregistro:
+
+
+ - Cuando una escena se activa, recorrerá el árbol de la escena para permitir a las capas el autoregistro de los eventos de director.window. El recorrido comienza por la escena, y se traslada solo a los hijos de clase layer.
+
+ - Cuando es alcanzado por este recorrido, toda capa cuya variable de clase is_event_handler tenga un valor True, se registrará a si misma como listener de director.window.
+
+   El registro será de la forma::
+
         director.window.push_handlers(layer)
 
-   So any method whose name matches an <event name> will be registered as a listener.
 
- - When the scene becomes inactive (by director.pop or director.replace for example), the matching walk calling::
+   De forma que cada método cuyo nombre coincida con un <nombre de evento> será registrado como listener.
 
-        director.window.remove_handlers(layer)      
+ - Cuando la escena se desactive (por medio de director.pop o director.replace por ejemplo), se iniciará el recorrido que coincida llamando::
 
-   will be issued.
+        director.window.remove_handlers(layer)
 
-Events generated by cocos itself:
+
+Eventos generados propios de cocos:
 
     - (director, 'on_push')
     - (director, 'on_pop')
     - (director, 'on_resize')
     - (director, 'on_cocos_resize')
 
-Cocos registers a default key listener that provides handy functionality, see :doc:`default_handlers`
+Cocos registra un listener de teclado que provee de funcionalidad muy útil,
+ver :doc:`default_handlers`
 
 .. _The pyglet Event Framework: http://www.pyglet.org/doc/programming_guide/the_pyglet_event_framework.html
+
+

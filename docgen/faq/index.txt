@@ -1,105 +1,106 @@
-===========
-cocos2d FAQ
-===========
+==============
+FAQ de cocos2d
+==============
 
-----------------------------------
-cocos2d Frequently Asked Questions
-----------------------------------
+-------------------------------
+Preguntas Frecuentes de cocos2d
+-------------------------------
 
 
 .. contents::
 	:local:
 
-Can I use 3D objects in cocos2d ?
----------------------------------
+Se pueden usar objetos 3d en cocos2d ?
+--------------------------------------
 
-Yes. cocos2d uses `pyglet`_ / OpenGL so you can 
-use 3D objects and use them within cocos2d.
+Si. cocos2d usa `pyglet`_ / OpenGL así que es posible
+usar objetos 3D y usarlos en el entorno de cocos2d.
 
-You can include some 3D objects in your 2d game
-to improve the quality of your graphics without any problem.
+Puedes incluir algunos objetos 3D en tu juego 2D
+para mejorar la calidad de tus gráficos sin problemas.
 
-Also, the default projection matrix of cocos2d is a 3D one,
-so probably you won't need to change it. But you can override 
-the projection matrix by registering to the ``director on_resize``
-event. See the `test/test_custom_on_resize.py` code as an example.
+Además, la matriz de proyección por defecto de cocos2d es de hecho 3D,
+y por lo tanto no necesitas cambiarla. Pero se puede reemplazar la la
+matriz de proyección registrando un evento ``director on_resize``. Ver el
+código de la prueba `test/test_custom_on_resize.py` como ejemplo.
 
-To enable OpenGL depth test, you can call Director's `set_depth_test` method.
+Para habilitar las pruebas extendidas de OpenGL, se llama al método
+`set_depth_test` de Director.
 
-Also, remember that cocos2d focuses on 2D games, so if you want
-to create a full-blown 3D game, `Panda3d`_ will suit you best.
+Recuerda también que cocos2d está diseñado para juegos 2D, así que
+para juegos 3D completos, `Panda3d`_ será más apropiado.
 
+Se pueden usar las acciones y los sprite de cocos2d sin el resto del entorno ?
+------------------------------------------------------------------------------
 
-Can I use cocos2d's sprites and actions without the rest of the framework ?
----------------------------------------------------------------------------
+Respuesta breve: **No**
+Respuesta larga: **Si**
 
-Short answer: **No**.
-Long answer: **Yes**.
+Casi todo lo que contiene cocos2d es un objeto `CocosNode` (``Sprite``, 
+``Layer``, ``Scene``, etc...), así que la forma más fácil de usar los sprite
+(o cualquier otro objeto `CocosNode`) es reescribir `CocosNode` en tu proyecto.
 
-Almost everything in cocos2d is `CocosNode` object (``sprites``, ``layers``,
-``scenes``, etc...), so the easiest way to use cocos2d's sprites (or any
-other `CocosNode` object) is to port `CocosNode` to your project.
+Como `CocosNode` usa el método `get_window_size` de Director, deberás crear
+un stub de Director en tu proyecto que implemente `get_window_size`.
+También debes llamar al método `CocosNode.visit` desde tu bucle principal para
+dibujar los sprite.
 
-Since `CocosNode` uses director's `get_window_size` method, you shall create
-a Director stub in your project that implements `get_window_size`.
-You shall also call the `CocosNode.visit` method from your main loop to draw
-the sprites.
-
-Although I haven't tried it, I think this shall work ok. If it doesn't work,
-let us know.
-
-
-Can I code a presentation (ala PowerPoint) in cocos2d ?
--------------------------------------------------------
-
-Yes, you can.
-
-Since cocos2d has features like 'scene flow control' and transitions
-you can code a presentation using cocos2d relatively easy, and make
-it look pretty cool using those transitions.
-
-Did you know that we have OpenGL transitions, like the ones you will find
-in Apple's Keynote and OpenOffice's Impress ? That's cool :-)
-
-For example, the lighting talk that we did in PyCon 2008 was coded in cocos2d.
-The source code is here: `pycon 2008 cocos2d lighting talk`_
-
-That being said, you should bear in mind that cocos2d is not a presentation
-tool. We are not planning to add presentation-like features to cocos2d.
-
-If you want a python presentation tool, we recommend:
-`Bruce the Presentation Tool`_
+Aunque no lo he intentado, creo que esto debería funcionar bien. Si no es el
+caso, avísanos.
 
 
-I get this error: ERROR: GPU doesn't support Frame Buffers Objects. Can't continue
-----------------------------------------------------------------------------------
+Puedo escribir una presentación (estilo PowerPoint) con cocos2d ?
+-----------------------------------------------------------------
 
-This means that your GPU doesn't support the ``GL_EXT_framebuffer_object`` extension.
+Si, puedes.
 
-cocos2d's `effects`_ needs this extension, and some transitions that depends on
-some effects will need it too.
+Como cocos2d tiene características como 'control del flujo de la escena' y
+transiciones, puedes escribir una presentación usando cocos2d con bastante
+facilidad, y hacer que se vea muy bien usando esas transiciones.
 
-The workaround is to activate the *GenericGrabber* by editing the ``cocos/framegrabber.py`` file.
-To do so, modify these lines::
+Sabías que tenemos transiciones OpenGL, como las que se pueden ver en Keynote
+de Apple e Impress de OpenOffice? Es genial :-)
+
+Por ejemplo, la charla relámpago que hicimos en PyCon 2008 se escribió con cocos2d.
+El código fuente está aquí: `pycon 2008 cocos2d lighting talk`_
+
+De todos modos, debes tener en cuenta que cocos2d no es una herramienta para
+crear presentaciones. No hay planes de agregar funcionalidades para
+crear presentaciones en cocos2d.
+
+Si estás buscando una herramienta para python de presentaciones, te 
+recomendamos: `Bruce the Presentation Tool`_
+
+
+Me sale este error: ERROR: GPU doesn't support Frame Buffers Objects. Can't continue
+------------------------------------------------------------------------------------
+
+Significa que tu GPU no tiene soporte para la extensión ``GL_EXT_framebuffer_object``.
+
+Los `efectos <effects>`_ de cocos2d necesitan esa extensión, y algunas 
+transiciones que dependen de algunos efectos también los necesitan.
+
+Una forma de resolverlo es activando *GenericGrabber* modificando el archivo 
+``cocos/framegrabber.py``. Para hacerlo, cambia las siguientes líneas::
 
     raise Exception("ERROR: GPU doesn't support Frame Buffers Objects. Can't continue")
     #_best_grabber = GenericGrabber
     #return _best_grabber()
 
-into these ones::
+y reemplázalas por estas::
 
     #raise Exception("ERROR: GPU doesn't support Frame Buffers Objects. Can't continue")
     _best_grabber = GenericGrabber
     return _best_grabber()
 
-**WARNING** : This modification will let you see the effects, but it doesn't
-support some features, like having effects on layers or sprites.
-It will also perform much slower. And we don't support it.
+**CUIDADO** : Esta modificación hara que veas los efectos, pero no soporta
+algunas características, como los efectos en capas o en sprite. Además
+tendrá un rendimiento muy inferior. Y no lo recomendamos.
 
-As we said, it is a workaround, not a fix.
+Como hemos dicho antes, es una forma de resolverlo, no una solución.
 
-If you want to fix it, you can contribute with a `pbuffer grabber`_ .
-This unfinished code might help you: `gl_pbuffer.py`_
+Si quieres solucionarlo, puedes contribuir con `pbuffer grabber`_ .
+Este código en proceso puede serte útil: `gl_pbuffer.py`_
 
 
 
